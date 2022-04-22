@@ -1,0 +1,10 @@
+{
+	"name": "GU Community Management Snippets",
+	"version": "0.0.1",
+	"manifest_version": 3,
+	"host_permissions": ["<all_urls>"],
+	"permissions": ["scripting"],
+	"background": {
+		"service_worker": "background.js"
+	}
+}
