@@ -1,16 +1,16 @@
-const snippets = [
+let snippets = [
 	`Hi {{first_name}}, you can track your <ACTIVITY UNITS> here in Messenger by typing "Menu" then enter, and click on "Record <ACTIVITY UNITS>." Enter the number of <ACTIVITY UNITS> you achieved that day! Be sure to only enter digits when prompted and not words (ex. "3" or "15").`,
 	`{{first_name}} - To correct your activity total, type "Menu" and tap the "Record <ACTIVITY UNITS>" button, then tap "Edit my total <ACTIVITY UNITS>" and correct your total <ACTIVITY UNITS> completed. Thanks for joining us! `,
 	`Hi {{first_name}}! Thanks for sharing your progress! If you want to track your progress and motivate the team to hit our challenge goal, we encourage you to post your photos/videos in the group! Remember to continue logging your <ACTIVITY UNITS> here in Messenger. 😄`,
 	`Thank you for supporting our mission, {{first_name}}!`,
 	`Hi {{first_name}}, how can we help you?`,
 	`Hi {{first_name}} - We have updated your information in our system. Thanks for supporting our mission!`,
-	`Hi {{first_name}}! This challenge will run through the month of <CHALLENGE MONTH>. You can log <ACTIVITY UNITS> here in Messenger from <CHALLENGE MONTH> 1st until the end of the month, but fundraising goes through <END DATE>. Thank you for supporting <ORG>!`,
+	`Hi {{first_name}}! This challenge will run through the month of <CHALLENGE MONTH>. You can log <ACTIVITY UNITS> here in Messenger from <CHALLENGE MONTH> 1 until the end of the month, but fundraising goes through <END DATE>. Thank you for supporting <ORG>!`,
 	`Hi {{first_name}} - We are experiencing some technical issues today and are working on resolving this issue. We apologize for the inconvenience of logging your <ACTIVITY UNITS>!`,
 	`Hi {{first_name}}! We're sorry you're having trouble! Please try accessing the link on your computer rather than through your mobile device. Let us know if you continue to experience this issue. Thank you!`,
 	`Thank you for sharing your story, {{first_name}}! We are proud to have you join the challenge. 😊`,
-	`Hi {{first_name}} - This challenge and logging <ACTIVITY UNITS> will officially start on <EVENT MONTH> 1st, but you don't have to wait to start fundraising! Thank you for supporting our mission. 😄`,
-	`Hi {{first_name}} - As long as you have clicked the link below and chosen to participate in this challenge, you are good to go! You can start logging <ACTIVITY UNITS> on <EVENT MONTH> 1st. 😄
+	`Hi {{first_name}} - This challenge and logging <ACTIVITY UNITS> will officially start on <EVENT MONTH> 1, but you don't have to wait to start fundraising! Thank you for supporting our mission. 😄`,
+	`Hi {{first_name}} - As long as you have clicked the link below and chosen to participate in this challenge, you are good to go! You can start logging <ACTIVITY UNITS> on <EVENT MONTH> 1. 😄
 👉<OPT-IN URL>`,
 	`Hi {{first_name}}! You can manage your team from the menu dashboard. Simply type "Menu" then enter and select "Team Settings" and follow the prompts from there. Let us know if you have any other questions!`,
 	`Hi {{first_name}}! You can raise money for this challenge by starting a personal fundraiser for <ORG> here 👉<FUNDRAISING URL>. 
@@ -30,10 +30,10 @@ https://www.facebook.com/fundraisers/manage`,
 ];
 
 let textBoxBuffer;
+const timeout = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const handleClick = async (e) => {
 	if (await textBoxActive()) {
-		console.log('HERE');
 		const textBox = document.activeElement;
 		textBox?.setAttribute('id', new Date().getTime());
 		if (textBox?.outerHTML != textBoxBuffer?.outerHTML || !document.querySelectorAll('.custom-button').length) {
@@ -60,21 +60,190 @@ const createButtons = (post, textBox) => {
 	snippets.forEach((s, index) => setTimeout(() => createButton(post, textBox, s, index), 10 * index));
 };
 
+const createStoryButton = async (post) => {
+	if (!window?.location?.href) return;
+	post.style.transition = 'margin 300ms';
+	post.style.marginTop = '3rem';
+	await timeout(175);
+	const button = document.createElement('button');
+	const config = getConfigFromGroupUrl(window.location.href);
+
+	button.style = `position: absolute;
+        top: 0;
+        border-radius: 50%;
+        margin-top: -1rem;
+        margin-left: 20rem;
+        height: 50px;
+        width: 50px;
+        background-color: ${window
+					.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
+					.getPropertyValue('--primary-button-background')};
+        border:none;
+        outline: 10px solid ${
+					window.getComputedStyle(document.querySelector('[data-pagelet="DiscussionRootSuccess"]').children[0])
+						.backgroundColor
+				};
+        font-size: 2.5rem;
+        transition: all 0.1s ease-in-out;
+        transform: scale(0.1);
+        color: white;
+        `;
+	button.classList.add('story-button');
+	button.innerText = '+';
+
+	button.setAttribute(
+		'post_id',
+		[...post.querySelectorAll('a')].find((a) => a.href.includes('/post_insights/')).href.split('/')[6]
+	);
+	button.setAttribute(
+		'user_id',
+		[...post.querySelectorAll('a')].find((a) => a.href.includes('/user/')).href.split('/')[6]
+	);
+
+	button.addEventListener(
+		'click',
+		async (e) => {
+			e.preventDefault();
+			const seeMoreElement = Array.from(post.querySelectorAll('div'))
+				.filter((el) => el.innerText.toLowerCase().includes('see more'))
+				.slice(-1)
+				.pop();
+			if (seeMoreElement) seeMoreElement.click();
+			await timeout(300);
+			const postContentArray = post.innerText
+				.split('View insights')[0]
+				.split('\n')
+				.filter((el) => !/\:\d\d\s\/\s\d\:\d\d/.test(el))
+				.map((el) => el.trim().replace('· ', ''))
+				.filter((el) => el && !/^\+\d+$/.test(el));
+			const name = postContentArray[0].split(' is with')[0].split(' is at ')[0];
+			const time = postContentArray[1];
+			const content = postContentArray.slice(3).join(' ').replace('· ', '');
+
+			if (name.includes(' shared a post.')) {
+				name.replace(' shared a post.', '');
+				if (content.includes('M Facebook fundraisers ')) content = content.split('M Facebook fundraisers ')[1];
+			}
+
+			const postObject = {
+				user_id: e.target.getAttribute('user_id'),
+				name,
+				time: getTimeOfPostFromRelativeTime(time),
+				content,
+				group_url: window.location.href,
+				post_id: e.target.getAttribute('post_id'),
+				challenge_id: config.id,
+			};
+
+			fetch('https://abc.1gu.xyz/story', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(postObject),
+			});
+			console.log(postObject);
+			button.remove();
+		},
+		{ once: true }
+	);
+
+	post.appendChild(button);
+
+	setTimeout(() => (button.style.transform = 'scale(1)'), 10);
+
+	button.addEventListener(
+		'mouseover',
+		(e) => {
+			button.style.transform = 'scale(1.1)';
+			button.style.backgroundColor = '#04c3cb';
+		},
+		false
+	);
+	button.addEventListener(
+		'mouseout',
+		(e) => {
+			button.style.backgroundColor = `${window
+				.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
+				.getPropertyValue('--primary-button-background')}`;
+			button.style.transform = 'scale(1)';
+		},
+		false
+	);
+};
+
+const getTimeOfPostFromRelativeTime = (string) => {
+	if (/^\d+h$/.test(string)) return subtractHours(string.replace('h', ''));
+	if (/^\d+m$/.test(string)) return subtractMinutes(string.replace('m', ''));
+	if (/^Yesterday.*[A|P]M$/.test(string)) return getYesterday(string);
+	if (
+		/^[January|February|March|April|May|June|July|August|September|October|November|December].*\d\d\sat\s.*[A|P]M$/.test(
+			string
+		)
+	)
+		return getDateFromString(string);
+};
+
+const subtractHours = (hours) => new Date(new Date().getTime() - 1000 * 60 * 60 * parseInt(hours));
+const subtractMinutes = (minutes) => new Date(new Date().getTime() - 1000 * 60 * parseInt(minutes));
+const getYesterday = (string) => {
+	const time = getTimeFromString(string);
+	const isMorning = /AM$/.test(string);
+	const today = new Date();
+	const yesterday = today.getDate() - 1;
+	const month = today.getMonth() + 1;
+	const year = today.getFullYear();
+	return new Date(`${year}/${month}/${yesterday} ${time} ${isMorning ? 'AM' : 'PM'}`);
+};
+
+const getTimeFromString = (string) => string.match(/\d+\:\d\d/)[0];
+
+const getDateFromString = (string) => {
+	const month = getMonthFromString(string);
+	const day = string.match(/\d+/);
+	const year = new Date().getFullYear();
+	const time = getTimeFromString(string);
+	const isMorning = /AM$/.test(string);
+	return new Date(`${year}/${month}/${day} ${time} ${isMorning ? 'AM' : 'PM'}`);
+};
+
+const getMonthFromString = (string) => {
+	const monthNumber = months.find((month) => string.includes(month));
+	return months.indexOf(monthNumber) + 1;
+};
+
+const months = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December',
+];
+
 const createButton = (post, textBox, text, index) => {
 	const button = document.createElement('button');
 
 	button.style = `
         position: absolute;
-        border-radius: 50%;
-        margin-top: ${-2.5 * (index + 1)}rem;
+        border-radius: ${window
+					.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
+					.getPropertyValue('--button-corner-radius')};
+        margin-top: ${-2.75 * (index + 1)}rem;
         margin-left: -2rem;
         height: 2.25rem;
         width: 2.25rem;
-        background-color: dodgerblue;
-        border: none; 
-        font-size: 1.25rem;
-        font-weight: 900;
-        color: #fff;
+        background-color: ${window
+					.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
+					.getPropertyValue('--primary-button-background')};
+        color: #fff !important;
+        font-size: 1.1rem !important;
+        border: none;
+  
         box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
         transition: all 0.1s ease-in-out;
         transform: scale(0.1);
@@ -106,7 +275,7 @@ const addTooltip = (post, text, button) => {
         position: absolute;
         color: #33566a;
         padding: 2rem;
-        box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
         border-radius: 5px;
         width:500px;
         top: 0;
@@ -124,7 +293,9 @@ const addTooltip = (post, text, button) => {
 			tooltip.style.display = 'block';
 			tooltip.style.top = '-' + tooltip.getBoundingClientRect().height + 'px';
 			button.style.transform = 'scale(1.1)';
-			button.style.backgroundColor = 'tomato';
+			button.style.backgroundColor = '#04c3cb';
+			const storyButton = post.querySelector('.story-button');
+			if (storyButton) storyButton.style.transform = 'scale(0)';
 		},
 		false
 	);
@@ -132,8 +303,18 @@ const addTooltip = (post, text, button) => {
 		'mouseout',
 		(e) => {
 			tooltip.style.display = 'none';
-			button.style.backgroundColor = 'dodgerblue';
+			button.style.backgroundColor = `${window
+				.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
+				.getPropertyValue('--primary-button-background')}`;
 			button.style.transform = 'scale(1)';
+			const storyButton = post.querySelector('.story-button');
+
+			setTimeout(() => {
+				const showingTooltip = [...post.querySelectorAll('.custom-tooltip')].find(
+					(t) => window.getComputedStyle(t).display === 'block'
+				);
+				if (!showingTooltip) storyButton.style.transform = 'scale(1)';
+			}, 300);
 		},
 		false
 	);
@@ -142,21 +323,38 @@ const addTooltip = (post, text, button) => {
 const upsertPreview = (node, text, textBox) => {
 	let preview = node.querySelector('.custom-preview');
 	if (preview) {
-		preview.appendChild(constructSnippet(node, text, textBox));
+		let adjustedText = text;
+		if (preview.children.length) {
+			let textToReplace = text.match(/^Hi.*{{first_name}}\s*[\,\.\!\-]\s*|\,\s+{{first_name}}/);
+			adjustedText = capitalize(text.replace(textToReplace, ''));
+		}
+
+		if (
+			[...preview.children].find((p) => p.innerText === constructSnippet(node, text, textBox).innerText) ||
+			[...preview.children].find((p) => p.innerText === constructSnippet(node, adjustedText, textBox).innerText)
+		)
+			return;
+		preview.appendChild(constructSnippet(node, adjustedText, textBox));
 	} else {
 		preview = document.createElement('div');
 		preview.classList.add('custom-preview');
 		preview.style = `
-            background-color: #f0f0f0;
+            background-color: white;
             max-width: 650px;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 1rem;
             box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
             font-size:1.1rem;
             color: #33566a;
+            transition: all 0.1s ease-in-out;
+            transform: scale(0.1);
+            margin-top: 1rem;
             `;
 		preview.appendChild(constructSnippet(node, text, textBox));
 		node.appendChild(preview);
+		setTimeout(() => {
+			preview.style.transform = 'scale(1)';
+		}, 50);
 	}
 	navigator.clipboard.writeText(preview.innerText);
 	return;
@@ -178,6 +376,8 @@ const getName = (post) => {
 };
 
 const constructSnippet = (node, text, textBox) => {
+	if (!window?.location?.href) return;
+
 	const config = getConfigFromGroupUrl(window.location.href);
 
 	const snippet = document.createElement('p');
@@ -186,7 +386,7 @@ const constructSnippet = (node, text, textBox) => {
         background-color: #fff;
         border-radius: 5px;
         padding: 1.5rem;
-        box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
+        box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
     `;
 	const name = getName(node);
 	snippet.innerText = replaceTextWithConfigStuff(config, name, text);
@@ -228,10 +428,11 @@ const replaceTextWithConfigStuff = (config, name, string) => {
 };
 
 const getPostElementFromTextBox = (node) => {
-	if (node.parentElement.getAttribute('role') === 'article') {
-		return node.parentElement.parentElement.parentElement.parentElement.parentElement;
+	if (!node) return;
+	if (node?.parentElement?.getAttribute('role') === 'article' && !node?.parentElement?.getAttribute('aria-label')) {
+		return node?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement;
 	} else {
-		return getPostElementFromTextBox(node.parentElement);
+		return getPostElementFromTextBox(node?.parentElement);
 	}
 };
 
@@ -246,7 +447,7 @@ const textBoxActive = () =>
 
 let configs;
 
-const getConfigFromGroupUrl = (groupUrl = window.location.href) =>
+const getConfigFromGroupUrl = (groupUrl = window?.location?.href) =>
 	configs.find((config) => config.group_url === groupUrl);
 
 const Snakify = {
@@ -274,26 +475,21 @@ const Snakify = {
 
 const capitalize = (input) => {
 	if (!input) return '';
-	const capitalizeWord = (string) => {
-		return string.substring(0, 1).toUpperCase() + string.substring(1);
-	};
+	return input.substring(0, 1).toUpperCase() + input.substring(1);
+};
 
-	const arr = input.split(' ');
-
-	if (typeof input === 'string') {
-		if (arr.length === 1) {
-			return capitalizeWord(input);
-		} else if (arr.length > 1) {
-			return arr.map((el) => capitalizeWord(el)).join(' ');
-		}
-	} else if (Array.isArray(input)) {
-		return input.map((el) => capitalizeWord(el));
+const handleMouseover = (e) => {
+	const post = getPostElementFromTextBox(e.target);
+	if (post && !post.getAttribute('story-button-created')) {
+		post.setAttribute('story-button-created', 'true');
+		createStoryButton(post);
 	}
-	return null;
 };
 
 (async () => {
+	if (!/.*facebook.*groups/.test(window.location.href)) return;
 	window.addEventListener('click', handleClick, true);
+	window.addEventListener('mouseover', handleMouseover, { passive: true });
 	const rawConfigs = fetch('https://abc.1gu.xyz/events', {
 		headers: {
 			key: 'eranissodamncool',
@@ -305,4 +501,5 @@ const capitalize = (input) => {
 		(config) => (config.activity_units = config.activity_unit === 'crunch' ? 'crunches' : config.activity_unit + 's')
 	);
 	console.log(configs.length);
+	doThing();
 })();
