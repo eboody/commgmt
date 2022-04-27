@@ -1,9 +1,11 @@
-const capitalize = (input) => {
+const Utils = {};
+
+Utils.capitalize = (input) => {
 	if (!input) return '';
 	return input.substring(0, 1).toUpperCase() + input.substring(1);
 };
 
-const Snakify = {
+Snakify = {
 	string: (string) => {
 		return string
 			.toLowerCase()
@@ -26,7 +28,7 @@ const Snakify = {
 	},
 };
 
-const formatDate = (string) => {
+Utils.formatDate = (string) => {
 	let input = string;
 	if (Object.prototype.toString.call(string) === '[object Date]') input = string.toString();
 
@@ -41,4 +43,15 @@ const formatDate = (string) => {
 	return date.toLocaleDateString('en-US', options);
 };
 
-const timeout = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+Utils.timeout = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+Utils.onVisible = (element, callback) => {
+	new IntersectionObserver((entries, observer) => {
+		entries.forEach((entry) => {
+			if (entry.intersectionRatio > 0) {
+				callback(element);
+				observer.disconnect();
+			}
+		});
+	}).observe(element);
+};

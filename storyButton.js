@@ -1,22 +1,22 @@
-const storyButton = {};
+const StoryButton = {};
 
-storyButton.create = async (post) => {
-	await storyButton.applyPostTransition(post);
+StoryButton.create = async (post) => {
+	await StoryButton.applyPostTransition(post);
 
 	const button = document.createElement('button');
 
-	storyButton.setStyles(button);
+	StoryButton.setStyles(button);
 
-	storyButton.applyAttributes(button, post);
+	StoryButton.applyAttributes(button, post);
 
-	storyButton.addListeners(button, post);
+	StoryButton.addListeners(button, post);
 
 	post.appendChild(button);
 
 	setTimeout(() => (button.style.transform = 'scale(1)'), 10);
 };
 
-storyButton.setStyles = (button) => {
+StoryButton.setStyles = (button) => {
 	const elemenWithBackgroundColor = document.querySelector('[data-pagelet="DiscussionRootSuccess"]')?.children[0];
 	const backgroundColor = elemenWithBackgroundColor
 		? window.getComputedStyle(elemenWithBackgroundColor).backgroundColor
@@ -48,7 +48,7 @@ storyButton.setStyles = (button) => {
 	button.style = styles;
 };
 
-storyButton.applyAttributes = (button, post) => {
+StoryButton.applyAttributes = (button, post) => {
 	button.classList.add('story-button');
 	button.innerText = '+';
 
@@ -62,19 +62,14 @@ storyButton.applyAttributes = (button, post) => {
 	);
 };
 
-storyButton.applyPostTransition = async (post) => {
+StoryButton.applyPostTransition = async (post) => {
 	post.style.transition = 'margin 300ms';
 	post.style.marginTop = '3rem';
-	await timeout(175);
+	await Utils.timeout(175);
 };
 
-storyButton.addListeners = (button, post) => {
-	button.addEventListener(
-		'click',
-		async (e) => {},
-		// await storyButton.handleClick(e, post)
-		{ once: true }
-	);
+StoryButton.addListeners = (button, post) => {
+	button.addEventListener('click', async (e) => await StoryButton.handleClick(e, post), { once: true });
 
 	button.addEventListener(
 		'mouseover',
@@ -96,7 +91,7 @@ storyButton.addListeners = (button, post) => {
 	);
 };
 
-storyButton.handleHover = async (e, post) => {
+StoryButton.handleHover = async (e, post) => {
 	e.preventDefault();
 
 	const seeMoreElement = Array.from(post.querySelectorAll('div'))
@@ -105,16 +100,16 @@ storyButton.handleHover = async (e, post) => {
 		.pop();
 	if (seeMoreElement) seeMoreElement.click();
 
-	await timeout(300);
+	await Utils.timeout(300);
 
-	storyButton.saveStory(e, post);
+	StoryButton.saveStory(e, post);
 
 	console.log(postObject);
 	// e.target.remove();
 };
 
-storyButton.saveStory = async (e, post) => {
-	const postObject = storyButton.getPostObject(e, post);
+StoryButton.saveStory = async (e, post) => {
+	const postObject = StoryButton.getPostObject(e, post);
 	fetch('https://abc.1gu.xyz/story', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -122,7 +117,7 @@ storyButton.saveStory = async (e, post) => {
 	});
 };
 
-storyButton.getPostObject = (e, post) => {
+StoryButton.getPostObject = (e, post) => {
 	const postContentArray = post.innerText
 		.split('View insights')[0]
 		.split('\n')
