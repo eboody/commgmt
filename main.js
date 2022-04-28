@@ -33,13 +33,18 @@ const waitForFeed = () => {
 
 	const config = { attributes: true, childList: true, subtree: true };
 
-	const callback = function (mutationsList, observer) {
+	let observing = false;
+
+	const callback = function (mutationsList, obs) {
 		mutationsList.forEach((mutation) => {
 			if (mutation.type === 'childList') {
 				if (document.querySelector('[role="feed"]')) {
-					observer.disconnect();
 					console.log('Got feed');
-					observeFeed();
+					if (!observing) {
+						observing = true;
+						obs.disconnect();
+						observeFeed();
+					}
 					return;
 				}
 			}

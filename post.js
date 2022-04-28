@@ -25,13 +25,14 @@ Post.expand = function (post) {
 	if (seeMoreElement) seeMoreElement.click();
 };
 
-Post.save = (post) => {
-	const postObject = Post.createPostObject(post);
-	if (!postObject.content) return;
+Post.save = async (post) => {
+	await Config.waitForConfig();
+	const postObject = await Post.createPostObject(post);
+	if (!postObject.content || postObject.name === Config.data.nonprofit) return;
 	console.log(postObject);
 };
 
-Post.createPostObject = (post) => {
+Post.createPostObject = async (post) => {
 	const name = post.querySelector('h3 strong').innerText;
 	const content = post.querySelector('[data-ad-preview="message"]')?.textContent;
 	const time = Post.getTimeOfPostFromRelativeTime(

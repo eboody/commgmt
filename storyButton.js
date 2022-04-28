@@ -109,7 +109,7 @@ StoryButton.handleHover = async (e, post) => {
 };
 
 StoryButton.saveStory = async (e, post) => {
-	const postObject = StoryButton.getPostObject(e, post);
+	const postObject = await StoryButton.getPostObject(e, post);
 	fetch('https://abc.1gu.xyz/story', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -117,7 +117,7 @@ StoryButton.saveStory = async (e, post) => {
 	});
 };
 
-StoryButton.getPostObject = (e, post) => {
+StoryButton.getPostObject = async (e, post) => {
 	const postContentArray = post.innerText
 		.split('View insights')[0]
 		.split('\n')

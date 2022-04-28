@@ -36,4 +36,14 @@ Config.getConfig = async () => {
 	}
 };
 
-Config.getConfig();
+Config.waitForConfig = async () => {
+	let count = 0;
+	while (!Config?.data?.id) {
+		await Utils.timeout(1000);
+		count++;
+		if (count === 10) throw "Couldn't get config";
+	}
+};
+(async () => {
+	await Config.getConfig();
+})();
