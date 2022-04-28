@@ -49,7 +49,7 @@ Post.createPostObject = async (post) => {
 			.join(' ')
 			.replace(/\s*\·\s*/, '');
 	const time = Post.getTimeOfPostFromRelativeTime(
-		post.querySelector('span[id]')?.querySelector('[aria-label]')?.innerText
+		post.querySelector('span[id]')?.querySelector('[aria-label]')?.innerText || postContentArray[1]
 	);
 	const post_id = [...post.querySelectorAll('a')].find((a) => a.href.includes('/post_insights/'))?.href.split('/')[6];
 	const user_id = [...post.querySelectorAll('a')].find((a) => a.href.includes('/user/'))?.href.split('/')[6];
