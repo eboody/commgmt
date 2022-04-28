@@ -2,7 +2,9 @@ const Post = {
 	dates: null,
 };
 
-Post.process = (post) => {
+Post.process = async (post) => {
+	const postObject = await Post.createPostObject(post);
+	if (postObject.name === Config.data.nonprofit) return;
 	Utils.onVisible(post.querySelector('svg'), () =>
 		setTimeout(() => {
 			StoryButton.create(post);
@@ -26,17 +28,28 @@ Post.expand = function (post) {
 };
 
 Post.save = async (post) => {
-	await Config.waitForConfig();
 	const postObject = await Post.createPostObject(post);
 	if (!postObject.content || postObject.name === Config.data.nonprofit) return;
 	console.log(postObject);
 };
 
 Post.createPostObject = async (post) => {
-	const name = post.querySelector('h3 strong').innerText;
-	const content = post.querySelector('[data-ad-preview="message"]')?.textContent;
+	const postContentArray = post.innerText
+		.split('View insights')[0]
+		.split('\n')
+		.filter((el) => !/\:\d\d\s\/\s\d\:\d\d/.test(el))
+		.map((el) => el.trim().replace('· ', ''))
+		.filter((el) => el && !/^\+\d+$/.test(el));
+	// console.log(post);
+	const name = post.querySelector('h3 strong')?.innerText;
+	const content =
+		post.querySelector('[data-ad-preview="message"]')?.textContent ||
+		postContentArray
+			.slice(3)
+			.join(' ')
+			.replace(/\s*\·\s*/, '');
 	const time = Post.getTimeOfPostFromRelativeTime(
-		post.querySelector('span[id]').querySelector('[aria-label]').innerText
+		post.querySelector('span[id]')?.querySelector('[aria-label]')?.innerText
 	);
 	const post_id = [...post.querySelectorAll('a')].find((a) => a.href.includes('/post_insights/'))?.href.split('/')[6];
 	const user_id = [...post.querySelectorAll('a')].find((a) => a.href.includes('/user/'))?.href.split('/')[6];

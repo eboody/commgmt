@@ -1,9 +1,12 @@
-const observeFeed = () => {
+const observeFeed = async () => {
+	await Config.waitForConfig();
+
 	let feedNode = document.querySelector('[role="feed"]');
 
-	const firstPost = feedNode?.children?.length && feedNode.children[1];
-
-	Post.process(firstPost);
+	[...feedNode.children].forEach((node) => {
+		if (!node.getAttribute('class') || node.querySelector('[class="suspended-feed"]')) return;
+		Post.process(node);
+	});
 
 	const config = { attributes: true, childList: true, subtree: false };
 
