@@ -9,7 +9,7 @@ const observeFeed = async () => {
 	});
 
 	const config = { attributes: true, childList: true, subtree: false };
-
+	console.clear();
 	const callback = function (mutationsList) {
 		mutationsList.forEach((mutation) => {
 			if (mutation.type === 'childList') {

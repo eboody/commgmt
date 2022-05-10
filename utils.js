@@ -55,3 +55,8 @@ Utils.onVisible = (element, callback) => {
 		});
 	}).observe(element);
 };
+
+Utils.isTextBox = (el) => {
+	if (el.parentElement?.getAttribute('role') === 'textbox' || el?.getAttribute('role') === 'textbox') return true;
+	return false;
+};

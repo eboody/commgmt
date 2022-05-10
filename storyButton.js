@@ -1,8 +1,6 @@
 const StoryButton = {};
 
 StoryButton.create = async (post) => {
-	await StoryButton.applyPostTransition(post);
-
 	const button = document.createElement('button');
 
 	StoryButton.setStyles(button);
@@ -15,6 +13,7 @@ StoryButton.create = async (post) => {
 };
 
 StoryButton.setStyles = (button) => {
+	button.setAttribute('class', 'story-button');
 	const elemenWithBackgroundColor = document.querySelector('[data-pagelet="DiscussionRootSuccess"]')?.children[0];
 	const backgroundColor = elemenWithBackgroundColor
 		? window.getComputedStyle(elemenWithBackgroundColor).backgroundColor
@@ -48,14 +47,8 @@ StoryButton.setStyles = (button) => {
 	button.style = styles;
 };
 
-StoryButton.applyPostTransition = async (post) => {
-	post.style.transition = 'margin 300ms';
-	post.style.marginTop = '3rem';
-	await Utils.timeout(175);
-};
-
 StoryButton.addListeners = (button, post) => {
-	button.addEventListener('click', async (e) => await StoryButton.handleClick(post), { once: true });
+	button.addEventListener('click', async (e) => console.log('clicked'), { once: true });
 
 	button.addEventListener(
 		'mouseover',
@@ -77,8 +70,8 @@ StoryButton.addListeners = (button, post) => {
 	);
 };
 
-StoryButton.saveStory = async (e, post) => {
-	const postObject = await StoryButton.getPostObject(e, post);
+StoryButton.saveStory = async (post) => {
+	const postObject = await Post.getPostObject(post);
 	fetch('https://abc.1gu.xyz/story', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },

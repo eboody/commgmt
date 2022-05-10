@@ -6,7 +6,16 @@
 	"content_scripts": [
 		{
 			"matches": ["https://www.facebook.com/groups/*"],
-			"js": ["utils.js", "storyButton.js", "configs.js", "post.js", "postDates.js", "main.js"]
+			"js": [
+				"utils.js",
+				"textBox.js",
+				"storyButton.js",
+				"configs.js",
+				"post.js",
+				"snippets.js",
+				"postDates.js",
+				"main.js"
+			]
 		}
 	]
 }

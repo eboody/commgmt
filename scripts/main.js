@@ -28,7 +28,8 @@ const createButtons = (post, textBox) => {
 	snippets.forEach((s, index) => setTimeout(() => createButton(post, textBox, s, index), 10 * index));
 };
 
-const createButton = (post, textBox, text, index) => {
+const createButton = (post, textBox, text) => {
+	const index = snippets.indexOf(text);
 	const button = document.createElement('button');
 
 	button.style = `
