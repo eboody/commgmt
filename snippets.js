@@ -1,35 +1,71 @@
 const Snippets = {
 	showing: false,
 	post: {},
-	data: [
-		`Hi {{first_name}}, you can track your <ACTIVITY UNITS> here in Messenger by typing "Menu" then enter, and click on "Record <ACTIVITY UNITS>." Enter the number of <ACTIVITY UNITS> you achieved that day! Be sure to only enter digits when prompted and not words (ex. "3" or "15").`,
-		`{{first_name}} - To correct your activity total, type "Menu" and tap the "Record <ACTIVITY UNITS>" button, then tap "Edit my total <ACTIVITY UNITS>" and correct your total <ACTIVITY UNITS> completed. Thanks for joining us! `,
-		`Hi {{first_name}}! Thanks for sharing your progress! If you want to track your progress and motivate the team to hit our challenge goal, we encourage you to post your photos/videos in the group! Remember to continue logging your <ACTIVITY UNITS> here in Messenger. 😄`,
-		`Thank you for supporting our mission, {{first_name}}!`,
-		`Hi {{first_name}}, how can we help you?`,
-		`Hi {{first_name}} - We have updated your information in our system. Thanks for supporting our mission!`,
-		`Hi {{first_name}}! This challenge will run through the month of <CHALLENGE MONTH>. You can log <ACTIVITY UNITS> here in Messenger from <CHALLENGE MONTH> 1 until the end of the month, but fundraising goes through <END DATE>. Thank you for supporting <ORG>!`,
-		`Hi {{first_name}} - We are experiencing some technical issues today and are working on resolving this issue. We apologize for the inconvenience of logging your <ACTIVITY UNITS>!`,
-		`Hi {{first_name}}! We're sorry you're having trouble! Please try accessing the link on your computer rather than through your mobile device. Let us know if you continue to experience this issue. Thank you!`,
-		`Thank you for sharing your story, {{first_name}}! We are proud to have you join the challenge. 😊`,
-		`Hi {{first_name}} - This challenge and logging <ACTIVITY UNITS> will officially start on <EVENT MONTH> 1, but you don't have to wait to start fundraising! Thank you for supporting our mission. 😄`,
-		`Hi {{first_name}} - As long as you have clicked the link below and chosen to participate in this challenge, you are good to go! You can start logging <ACTIVITY UNITS> on <EVENT MONTH> 1. 😄
-        👉<OPT-IN URL>`,
-		`Hi {{first_name}}! You can manage your team from the menu dashboard. Simply type "Menu" then enter and select "Team Settings" and follow the prompts from there. Let us know if you have any other questions!`,
-		`Hi {{first_name}}! You can raise money for this challenge by starting a personal fundraiser for <ORG> here 👉<FUNDRAISING URL>. 
-    
-        Once that's done, you can share your fundraising page with your Facebook friends! Thank you for supporting our mission!`,
-		`Hi {{first_name}}! Once you have created your personal fundraiser, it will automatically pop up on your Facebook Profile wall. You can also check and manage your fundraiser page by clicking on the link below. Let us know if you have any other questions! 😄
-    
-        https://www.facebook.com/fundraisers/manage`,
-		`Hi {{first_name}} - Please click the link below to access your fundraiser page: 
-        <PARTICIPANT'S FUNDRAISING URL>`,
-		`Hi {{first_name}} - This is a Facebook challenge and having a Facebook account is required to register in Messenger to track your progress and claim milestone rewards throughout the challenge. We will also share helpful tips, tricks, and reminders to enhance your challenge experience along the way! Thanks for joining us! 🙂`,
-		`{{first_name}} - You can log your <ACTIVITY UNITS> as many times as you like—multiple times a day or once a week—as long as you are keeping up to date with your numbers! Keep up the great work. 😎`,
-		`Hi {{first_name}} - We apologize for the technical issues you have been experiencing. Our team is working hard to solve the issue as quickly as possible. We will keep you updated! Thank you for your patience.`,
-		`Hi {{first_name}} - We are sorry you are having trouble. To help you with this issue, we recommend contacting Facebook Support here: 👉https://www.facebook.com/help/738034692937865`,
-		`Hi {{first_name}} - The issue you have been experiencing has been resolved. Thank you for your patience and support! Let us know if you have any questions.`,
-		`Hi {{first_name}} - The challenge has now ended. Thank you for your participation and your support! Stay tuned for the next challenge. 😊`,
+	sections: [
+		{
+			name: 'encourage',
+			icon: Icons.encourage,
+			messages: [
+				`Thank you for supporting our mission, {{first_name}}! `,
+				`Welcome to the team, <FIRST NAME>! Thanks for joining us!`,
+				`Thank you for sharing your story, {{first_name}}. We are proud to have you join the challenge. <ORG HEART>`,
+				`We are excited to have you join us for our challenge, <FIRST NAME>! Be sure to officially register by clicking the link below👇 to join us in Messenger and log your activity throughout the challenge. <ACTIVITY EMOJI>
+                <OPT-IN URL>`,
+				`Keep up the great work, <FIRST NAME>! Don't forget to create your <NONPROFIT> fundraiser by clicking the link below👇 to help our community reach our goal!
+                <1CLICK URL>`,
+			],
+		},
+		{
+			name: 'activity',
+			icon: Icons.activity,
+			messages: [
+				`Hi {{first_name}} - As long as you have clicked the link below and chosen to participate in this challenge, you are good to go! You can start logging <ACTIVITY UNITS> on <EVENT MONTH> 1. 😄
+👉<OPT-IN URL>`,
+				`Hi {{first_name}}, you can track your <ACTIVITY UNITS> in Messenger (link below) by typing "Menu" then enter, and clicking on "Record <ACTIVITY UNITS>." Enter the number of <ACTIVITY UNITS> you achieved that day! Be sure to only enter digits when prompted and not words (ex. "3" or "15").
+<OPT-IN URL>`,
+				`{{first_name}} - To correct your activity total in Messenger, type "Menu" and tap the "Record <ACTIVITY UNITS>" button, then correct your total <ACTIVITY UNITS> completed. Thanks for joining us! 
+<OPT-IN URL>`,
+				`Hi {{first_name}} - This challenge and logging <ACTIVITY UNITS> will officially start on <EVENT MONTH> 1, but you don't have to wait to start fundraising! Thank you for supporting our mission. 😄
+<FUNDRAISING URL>`,
+				`Hi {{first_name}}! This challenge will run through the month of <CHALLENGE MONTH>. You can log <ACTIVITY UNITS> in Messenger (link below) from <CHALLENGE MONTH> 1 until the end of the month, but fundraising goes through <END DATE>. Thank you for supporting <ORG>!
+<OPT-IN URL>`,
+				`<FIRST NAME> - This is a virtual event and you can complete your <ACTIVITY UNIT>s wherever works best for you! Click below👇 to opt-in to Messenger today to log your <ACTIVITY UNIT>s and claim rewards throughout the challenge. <CHALLENGE EMOJI>
+<OPT-IN URL>`,
+			],
+		},
+		{
+			name: 'fundraising',
+			icon: Icons.fundraising,
+			messages: [
+				`Hi <FIRST NAME> - You can raise money for this challenge by starting a personal Facebook fundraiser for <NONPROFIT> here: 
+👉<1CLICK URL>
+
+Once that's done, make the first donation yourself and then share your fundraising page with your Facebook friends! 💰`,
+				`<FIRST NAME> - Facebook does not take any fee from your donations. 100% of the donations go directly to <NONPROFIT>. <ORG HEART>`,
+				`<FIRST NAME> - Unfortunately, we cannot link any donations done outside of Facebook to your challenge fundraiser. You can have your friend send you money or a check directly, and then you can donate on their behalf on Facebook. Thank you for supporting our mission.`,
+				`Hi {{first_name}} - Once you have created your personal fundraiser, it will automatically pop up on your Facebook Profile wall. You can also check and manage your fundraiser page by clicking on the link below. Let us know if you have any other questions! 😄
+https://www.facebook.com/fundraisers/manage`,
+			],
+		},
+		{
+			name: 'teams',
+			icon: Icons.teams,
+			messages: [
+				`Hi {{first_name}} - You can manage your team from the menu dashboard in Messenger (link below). Simply type "Menu" then enter and select "Team Settings" and follow the prompts from there. Let us know if you have any other questions!
+<OPT-IN URL>`,
+				`Hi <FIRST NAME> - We encourage every member of your team to create a personal fundraiser for this challenge. If you choose to do a team fundraiser, you can click "Edit" to change the name of your fundraiser. Thanks for joining us!
+<1CLICK URL>`,
+			],
+		},
+		{
+			name: 'challenge',
+			icon: Icons.challenge,
+			messages: [
+				`Hi {{first_name}}! We're sorry you're having trouble! Please try accessing the link on your computer rather than through your mobile device. Let us know if you continue to experience this issue. Thank you!`,
+				`Hi {{first_name}} - This is a Facebook challenge and having a Facebook account is required to register in Messenger to track your progress and claim milestone rewards throughout the challenge. We will also share helpful tips, tricks, and reminders to enhance your challenge experience along the way! Thanks for joining us! 🙂`,
+				`Hi {{first_name}} - We apologize for the technical issues you have been experiencing. Our team is working hard to solve the issue as quickly as possible. We will keep you updated in Messenger! Thank you for your patience.`,
+			],
+		},
 	],
 };
 
@@ -46,7 +82,6 @@ Snippets.replaceTextWithConfigStuff = (config, name, string) => {
 };
 
 Snippets.handleClick = async (post) => {
-	Snippets.post = post;
 	// if (await textBoxActive()) {
 	// 	const textBox = document.activeElement;
 	// 	textBox?.setAttribute('id', new Date().getTime());
@@ -64,21 +99,41 @@ Snippets.handleClick = async (post) => {
 };
 
 Snippets.createButtons = (post, textBox) => {
-	Snippets.data.forEach((s, index) => setTimeout(() => createButton(post, textBox, s, index), 10 * index));
+	if (Snippets.showing) {
+		Snippets.removeCustomStuff();
+	}
+	Snippets.showing = true;
+	Snippets.sections.forEach((section, index) => {
+		setTimeout(() => createButton(Post.element, section, index), 10 * index);
+	});
 };
 
-const createButton = (post, textBox, text, index) => {
+Snippets.removeCustomStuff = () => {
+	Snippets.showing = false;
+	const previews = [...document.querySelectorAll('.custom-preview'), ...document.querySelectorAll('.custom-button')];
+	previews.forEach((el, index) => {
+		el.style.transform = 'scale(0)';
+		setTimeout(() => el.remove(), 10 * index);
+	});
+};
+
+const createButton = (post, section, index) => {
+	// console.log(section);
 	const button = document.createElement('button');
+
+	const same = '50';
+	const buttonHeight = same;
+	const buttonWidth = same;
 
 	button.style = `
         position: absolute;
         border-radius: ${window
 					.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
 					.getPropertyValue('--button-corner-radius')};
-        margin-top: ${-2.75 * (index + 1)}rem;
-        margin-left: -2rem;
-        height: 2.25rem;
-        width: 2.25rem;
+        margin-top: ${-3.75 * (index + 1)}rem;
+        margin-left: -2.5rem;
+        height: ${buttonHeight}px;
+        width: ${buttonWidth}px;
         background-color: ${window
 					.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
 					.getPropertyValue('--primary-button-background')};
@@ -89,24 +144,35 @@ const createButton = (post, textBox, text, index) => {
         box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
         transition: all 0.1s ease-in-out;
         transform: scale(0.1);
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     `;
 
-	button.innerText = `${index + 1}`;
+	// button.innerText = `${index + 1}`;
 	button.classList.add('custom-button');
 	button.classList.add(`button-${index + 1}`);
-	button.addEventListener('click', () => {
-		textBox.focus();
-		upsertPreview(post, text, textBox);
+	button.addEventListener('click', (e) => {
+		e.stopPropagation();
+		Textbox.focus();
+		// upsertPreview(post, text, textBox);
 	});
 
-	addTooltip(post, text, button);
+	addTooltip(post, section.name, button);
+
+	const image = document.createElement('img');
+	image.src = section.icon;
+	image.style.width = '100%';
+	button.appendChild(image);
 
 	post.children[0].appendChild(button);
 	setTimeout(() => (button.style.transform = 'scale(1)'), 15);
 };
 
 const addTooltip = (post, text, button) => {
-	const name = getName(post);
+	const name = Textbox.name;
 
 	const tooltip = document.createElement('div');
 
@@ -116,14 +182,12 @@ const addTooltip = (post, text, button) => {
         background-color: white;
         position: absolute;
         color: #33566a;
-        padding: 2rem;
+        padding: 10px;
         box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
         border-radius: 5px;
-        width:500px;
-        top: 0;
-        left: 40px;
         display: none;
-        font-size:1.1rem;
+        font-size: 1.1rem;
+        margin-left: 140px;
     `;
 
 	tooltip.innerText = Snippets.replaceTextWithConfigStuff(Config.data, name, text);
@@ -133,7 +197,7 @@ const addTooltip = (post, text, button) => {
 		'mouseover',
 		(e) => {
 			tooltip.style.display = 'block';
-			tooltip.style.top = '-' + tooltip.getBoundingClientRect().height + 'px';
+			// tooltip.style.top = '-' + tooltip.getBoundingClientRect().height + 'px';
 			button.style.transform = 'scale(1.1)';
 			button.style.backgroundColor = '#04c3cb';
 			const storyButton = post.querySelector('.story-button');
@@ -162,6 +226,63 @@ const addTooltip = (post, text, button) => {
 		false
 	);
 };
+// const addTooltip = (post, text, button) => {
+// 	const name = Textbox.name;
+
+// 	const tooltip = document.createElement('div');
+
+// 	tooltip.classList.add('custom-tooltip');
+
+// 	tooltip.style = `
+//         background-color: white;
+//         position: absolute;
+//         color: #33566a;
+//         padding: 2rem;
+//         box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+//         border-radius: 5px;
+//         width:500px;
+//         top: 0;
+//         left: 40px;
+//         display: none;
+//         font-size:1.1rem;
+//     `;
+
+// 	tooltip.innerText = Snippets.replaceTextWithConfigStuff(Config.data, name, text);
+
+// 	button.appendChild(tooltip);
+// 	button.addEventListener(
+// 		'mouseover',
+// 		(e) => {
+// 			tooltip.style.display = 'block';
+// 			tooltip.style.top = '-' + tooltip.getBoundingClientRect().height + 'px';
+// 			button.style.transform = 'scale(1.1)';
+// 			button.style.backgroundColor = '#04c3cb';
+// 			const storyButton = post.querySelector('.story-button');
+// 			if (storyButton) storyButton.style.transform = 'scale(0)';
+// 		},
+// 		false
+// 	);
+// 	button.addEventListener(
+// 		'mouseout',
+// 		(e) => {
+// 			tooltip.style.display = 'none';
+// 			button.style.backgroundColor = `${window
+// 				.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
+// 				.getPropertyValue('--primary-button-background')}`;
+// 			button.style.transform = 'scale(1)';
+// 			const storyButton = post.querySelector('.story-button');
+// 			if (!storyButton) return;
+
+// 			setTimeout(() => {
+// 				const showingTooltip = [...post.querySelectorAll('.custom-tooltip')].find(
+// 					(t) => window.getComputedStyle(t).display === 'block'
+// 				);
+// 				if (!showingTooltip) storyButton.style.transform = 'scale(1)';
+// 			}, 300);
+// 		},
+// 		false
+// 	);
+// };
 
 const getName = (post) => {
 	if (document.activeElement.getAttribute('aria-label').includes('Reply to'))
@@ -211,13 +332,4 @@ const upsertPreview = (node, text, textBox) => {
 	}
 	navigator.clipboard.writeText(preview.innerText);
 	return;
-};
-
-Snippets.removeCustomStuff = () => {
-	if (!Snippets.showing) return;
-	const previews = [...document.querySelectorAll('.custom-preview'), ...document.querySelectorAll('.custom-button')];
-	previews.forEach((el, index) => {
-		el.style.transform = 'scale(0)';
-		setTimeout(() => el.remove(), 10 * index);
-	});
 };

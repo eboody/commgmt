@@ -20,6 +20,7 @@ Config.getConfigs = async () => {
 };
 
 Config.getConfig = async () => {
+	if (window.location.href.includes('posts')) return;
 	let localConfigsString = localStorage.getItem('configs');
 
 	if (!localConfigsString) {
@@ -31,6 +32,7 @@ Config.getConfig = async () => {
 	Config.data = Config.getConfigFromGroupUrl(localConfigs);
 
 	if (!Config.data) {
+		s;
 		localStorage.removeItem('configs');
 		await Config.getConfig();
 	}

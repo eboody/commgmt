@@ -9,7 +9,7 @@ const observeFeed = async () => {
 	});
 
 	const config = { attributes: true, childList: true, subtree: false };
-	console.clear();
+	// console.clear();
 	const callback = function (mutationsList) {
 		mutationsList.forEach((mutation) => {
 			if (mutation.type === 'childList') {
@@ -42,8 +42,8 @@ const waitForFeed = () => {
 		mutationsList.forEach((mutation) => {
 			if (mutation.type === 'childList') {
 				if (document.querySelector('[role="feed"]')) {
-					console.log('Got feed');
 					if (!observing) {
+						console.log('Got feed');
 						observing = true;
 						obs.disconnect();
 						observeFeed();
@@ -60,3 +60,10 @@ const waitForFeed = () => {
 };
 
 window.addEventListener('load', waitForFeed, false);
+
+window.addEventListener('click', () => {
+	Textbox.clear();
+	Post.clear();
+	Snippets.removeCustomStuff();
+	console.log('Window removed stuff');
+});

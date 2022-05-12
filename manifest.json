@@ -8,7 +8,9 @@
 			"matches": ["https://www.facebook.com/groups/*"],
 			"js": [
 				"utils.js",
+				"icons.js",
 				"textBox.js",
+				"replyButton.js",
 				"storyButton.js",
 				"configs.js",
 				"post.js",
