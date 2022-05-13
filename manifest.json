@@ -9,6 +9,7 @@
 			"js": [
 				"utils.js",
 				"icons.js",
+				"colors.js",
 				"textBox.js",
 				"replyButton.js",
 				"storyButton.js",

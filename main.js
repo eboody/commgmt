@@ -32,6 +32,10 @@ const waitForFeed = () => {
 
 	console.log('Page loaded');
 
+	Colors.accent = window
+		.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
+		.getPropertyValue('--primary-button-background');
+
 	const target = document.body;
 
 	const config = { attributes: true, childList: true, subtree: true };

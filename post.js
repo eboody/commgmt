@@ -1,6 +1,7 @@
 const Post = {
 	dates: null,
 	selected: null,
+	element: null,
 };
 
 Post.clear = () => {
@@ -93,7 +94,7 @@ Post.setListeners = (post) => {
 		'click',
 		() => {
 			const thisPost = Post.createPostObject(post);
-			if (thisPost.post_id !== Post.selected?.post_id) {
+			if (thisPost.post_id !== Post.selected?.post_id || !Post.element) {
 				Snippets.removeCustomStuff();
 				Post.element = post;
 				Post.selected = thisPost;

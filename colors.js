@@ -1,0 +1,3 @@
+const Colors = {
+	accent: null,
+};

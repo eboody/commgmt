@@ -134,9 +134,7 @@ const createButton = (post, section, index) => {
         margin-left: -2.5rem;
         height: ${buttonHeight}px;
         width: ${buttonWidth}px;
-        background-color: ${window
-					.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
-					.getPropertyValue('--primary-button-background')};
+        background-color: ${Colors.accent};
         color: #fff !important;
         font-size: 1.1rem !important;
         border: none;
@@ -160,7 +158,24 @@ const createButton = (post, section, index) => {
 		// upsertPreview(post, text, textBox);
 	});
 
-	addTooltip(post, section.name, button);
+	button.addEventListener(
+		'mouseenter',
+		(e) => {
+			// console.log('mouse entered');
+			createSnippetsButtons(button, section);
+		},
+		false
+	);
+	button.addEventListener(
+		'mouseleave',
+		(e) => {
+			// console.log('mouse left');
+			removeSnippets(button);
+		},
+		false
+	);
+
+	// addTooltip(post, section.name, button);
 
 	const image = document.createElement('img');
 	image.src = section.icon;
@@ -169,6 +184,49 @@ const createButton = (post, section, index) => {
 
 	post.children[0].appendChild(button);
 	setTimeout(() => (button.style.transform = 'scale(1)'), 15);
+};
+const removeSnippets = (button) => button.querySelector('.section').remove();
+
+const createSnippetsButtons = (button, section) => {
+	const sectionElement = document.createElement('div');
+	sectionElement.setAttribute('class', 'section');
+	sectionElement.style = `
+        position: absolute;
+        left: 40px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        overflow:"hidden"
+        white-space: nowrap;
+        width: max-content;
+        padding-left: 15px;
+        height: 80px;
+        `;
+
+	section.messages.forEach((m, index) => {
+		const snippet = document.createElement('button');
+		snippet.innerText = index + 1;
+		snippet.style = `
+            width: 50px;
+            height: 50px;
+            display: inline-block;
+            margin: 0 3px;
+            background-color: ${Utils.shadeColor(Colors.accent, 20)};
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            border-radius: ${window
+							.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
+							.getPropertyValue('--button-corner-radius')};
+            transition: all 0.1s ease-in-out;
+
+        `;
+		addTooltip(Post.element, m, snippet);
+		sectionElement.appendChild(snippet);
+	});
+
+	button.appendChild(sectionElement);
 };
 
 const addTooltip = (post, text, button) => {
@@ -180,24 +238,25 @@ const addTooltip = (post, text, button) => {
 
 	tooltip.style = `
         background-color: white;
-        position: absolute;
+        position: static;
         color: #33566a;
         padding: 10px;
         box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
         border-radius: 5px;
         display: none;
         font-size: 1.1rem;
-        margin-left: 140px;
+        width: max-content;
+        max-width: 400px;
+        transition: all 0.1s ease-in-out;
     `;
 
 	tooltip.innerText = Snippets.replaceTextWithConfigStuff(Config.data, name, text);
 
 	button.appendChild(tooltip);
 	button.addEventListener(
-		'mouseover',
+		'mouseenter',
 		(e) => {
 			tooltip.style.display = 'block';
-			// tooltip.style.top = '-' + tooltip.getBoundingClientRect().height + 'px';
 			button.style.transform = 'scale(1.1)';
 			button.style.backgroundColor = '#04c3cb';
 			const storyButton = post.querySelector('.story-button');
@@ -206,7 +265,7 @@ const addTooltip = (post, text, button) => {
 		false
 	);
 	button.addEventListener(
-		'mouseout',
+		'mouseleave',
 		(e) => {
 			tooltip.style.display = 'none';
 			button.style.backgroundColor = `${window
@@ -251,7 +310,7 @@ const addTooltip = (post, text, button) => {
 
 // 	button.appendChild(tooltip);
 // 	button.addEventListener(
-// 		'mouseover',
+// 		'mouseenter',
 // 		(e) => {
 // 			tooltip.style.display = 'block';
 // 			tooltip.style.top = '-' + tooltip.getBoundingClientRect().height + 'px';
@@ -263,7 +322,7 @@ const addTooltip = (post, text, button) => {
 // 		false
 // 	);
 // 	button.addEventListener(
-// 		'mouseout',
+// 		'mouseleave',
 // 		(e) => {
 // 			tooltip.style.display = 'none';
 // 			button.style.backgroundColor = `${window
