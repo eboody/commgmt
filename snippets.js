@@ -69,16 +69,21 @@ https://www.facebook.com/fundraisers/manage`,
 	],
 };
 
-Snippets.replaceTextWithConfigStuff = (config, name, string) => {
+Snippets.replaceTextWithConfigStuff = (name, string) => {
 	return string
-		.replace(/\{+first.name\}+/g, name.split(' ')[0])
-		.replace(/<Activity\s+UNITS>/gi, config.activity_units)
-		.replace(/<event\smonth>/gi, config.event_month)
-		.replace(/<challenge\smonth>/gi, config.event_month)
-		.replace(/<End\sDate>/gi, Utils.formatDate(config.end_date))
-		.replace(/<org>/gi, config.nonprofit)
-		.replace(/<opt.in.url>/gi, config.opt_in_url)
-		.replace(/<FUNDRAISING\sURL>/gi, config.fbc_1click_url);
+		.replace(/(\{|\[|\<)+nonprofit(\}|\]|\>)+/gi, Config.data.nonprofit)
+		.replace(/(\{|\[|\<)+(activity|challenge).emoji(\}|\]|\>)+/gi, Config.data.challenge_emoji || '')
+		.replace(/(\{|\[|\<)+org.heart(\}|\]|\>)+/gi, Config.data.org_heart || '❤')
+		.replace(/(\{|\[|\<)+first.name(\}|\]|\>)+/gi, name?.split(' ')[0])
+		.replace(/(\{|\[|\<)Activity.UNIT((\}|\]|\>)?S)(\}|\]|\>)?/gi, Config.data.activity_units)
+		.replace(/(\{|\[|\<)Activity.UNIT(\}|\]|\>)/gi, Config.data.activity_unit)
+		.replace(/(\{|\[|\<)event.month(\}|\]|\>)/gi, Config.data.event_month)
+		.replace(/(\{|\[|\<)challenge.month(\}|\]|\>)/gi, Config.data.event_month)
+		.replace(/(\{|\[|\<)End.Date(\}|\]|\>)/gi, Utils.formatDate(Config.data.end_date))
+		.replace(/(\{|\[|\<)org(\}|\]|\>)/gi, Config.data.nonprofit)
+		.replace(/(\{|\[|\<)opt.in.url(\}|\]|\>)/gi, Config.data.opt_in_url)
+		.replace(/(\{|\[|\<)1click.URL(\}|\]|\>)/gi, Config.data.fbc_1click_url)
+		.replace(/(\{|\[|\<)FUNDRAISING\sURL(\}|\]|\>)/gi, Config.data.fbc_1click_url);
 };
 
 Snippets.handleClick = async (post) => {
@@ -99,18 +104,32 @@ Snippets.handleClick = async (post) => {
 };
 
 Snippets.createButtons = (post, textBox) => {
+	const groups = document.createElement('div');
+	groups.setAttribute('class', 'snippet-groups');
+
+	groups.style = `
+        position: absolute;
+        display: row;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        bottom: ${Post.element.getBoundingClientRect().height / 4}px;
+    `;
+
 	if (Snippets.showing) {
 		Snippets.removeCustomStuff();
 	}
 	Snippets.showing = true;
 	Snippets.sections.forEach((section, index) => {
-		setTimeout(() => createButton(Post.element, section, index), 10 * index);
+		setTimeout(() => groups.appendChild(createButton(Post.element, section, index), 10 * index));
 	});
+
+	post.appendChild(groups);
 };
 
 Snippets.removeCustomStuff = () => {
 	Snippets.showing = false;
-	const previews = [...document.querySelectorAll('.custom-preview'), ...document.querySelectorAll('.custom-button')];
+	const previews = [...document.querySelectorAll('.snippet-groups'), ...document.querySelectorAll('.custom-button')];
 	previews.forEach((el, index) => {
 		el.style.transform = 'scale(0)';
 		setTimeout(() => el.remove(), 10 * index);
@@ -126,11 +145,9 @@ const createButton = (post, section, index) => {
 	const buttonWidth = same;
 
 	button.style = `
-        position: absolute;
         border-radius: ${window
 					.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
 					.getPropertyValue('--button-corner-radius')};
-        margin-top: ${-3.75 * (index + 1)}rem;
         margin-left: -2.5rem;
         height: ${buttonHeight}px;
         width: ${buttonWidth}px;
@@ -138,7 +155,6 @@ const createButton = (post, section, index) => {
         color: #fff !important;
         font-size: 1.1rem !important;
         border: none;
-  
         box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
         transition: all 0.1s ease-in-out;
         transform: scale(0.1);
@@ -147,6 +163,7 @@ const createButton = (post, section, index) => {
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        margin-bottom: 5px;
     `;
 
 	// button.innerText = `${index + 1}`;
@@ -175,15 +192,16 @@ const createButton = (post, section, index) => {
 		false
 	);
 
-	// addTooltip(post, section.name, button);
+	addGroupTooltip(post, section.name, button, index);
 
 	const image = document.createElement('img');
 	image.src = section.icon;
 	image.style.width = '100%';
 	button.appendChild(image);
 
-	post.children[0].appendChild(button);
+	// post.children[0].appendChild(button);
 	setTimeout(() => (button.style.transform = 'scale(1)'), 15);
+	return button;
 };
 const removeSnippets = (button) => button.querySelector('.section').remove();
 
@@ -199,9 +217,9 @@ const createSnippetsButtons = (button, section) => {
         justify-content: center;
         overflow:"hidden"
         white-space: nowrap;
-        width: max-content;
         padding-left: 15px;
         height: 80px;
+        padding-right: 20px;
         `;
 
 	section.messages.forEach((m, index) => {
@@ -212,7 +230,7 @@ const createSnippetsButtons = (button, section) => {
             height: 50px;
             display: inline-block;
             margin: 0 3px;
-            background-color: ${Utils.shadeColor(Colors.accent, 20)};
+            background-color: ${Utils.shadeColor(index === 0 ? Colors.accent : Colors.codes[index], 20)};
             border: none;
             color: white;
             font-size: 1.5rem;
@@ -220,16 +238,16 @@ const createSnippetsButtons = (button, section) => {
 							.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
 							.getPropertyValue('--button-corner-radius')};
             transition: all 0.1s ease-in-out;
-
+            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
         `;
-		addTooltip(Post.element, m, snippet);
+		addTooltip(Post.element, m, snippet, index);
 		sectionElement.appendChild(snippet);
 	});
 
 	button.appendChild(sectionElement);
 };
 
-const addTooltip = (post, text, button) => {
+const addGroupTooltip = (post, text, button, index) => {
 	const name = Textbox.name;
 
 	const tooltip = document.createElement('div');
@@ -238,27 +256,30 @@ const addTooltip = (post, text, button) => {
 
 	tooltip.style = `
         background-color: white;
-        position: static;
+        position: absolute;
         color: #33566a;
         padding: 10px;
         box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
         border-radius: 5px;
         display: none;
-        font-size: 1.1rem;
+        font-size: 14px;
         width: max-content;
-        max-width: 400px;
+        max-width: 300px;
         transition: all 0.1s ease-in-out;
+        left: -100px;
     `;
 
-	tooltip.innerText = Snippets.replaceTextWithConfigStuff(Config.data, name, text);
+	tooltip.innerText = Utils.capitalize(text);
 
 	button.appendChild(tooltip);
+
 	button.addEventListener(
 		'mouseenter',
 		(e) => {
 			tooltip.style.display = 'block';
 			button.style.transform = 'scale(1.1)';
 			button.style.backgroundColor = '#04c3cb';
+			button.style.border = `2px solid ${Colors.accent}`;
 			const storyButton = post.querySelector('.story-button');
 			if (storyButton) storyButton.style.transform = 'scale(0)';
 		},
@@ -268,9 +289,81 @@ const addTooltip = (post, text, button) => {
 		'mouseleave',
 		(e) => {
 			tooltip.style.display = 'none';
-			button.style.backgroundColor = `${window
-				.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
-				.getPropertyValue('--primary-button-background')}`;
+			button.style.backgroundColor = Colors.accent;
+			button.style.transform = 'scale(1)';
+			button.style.boxShadow = 'rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px';
+			const storyButton = post.querySelector('.story-button');
+			if (!storyButton) return;
+
+			setTimeout(() => {
+				const showingTooltip = [...post.querySelectorAll('.custom-tooltip')].find(
+					(t) => window.getComputedStyle(t).display === 'block'
+				);
+				if (!showingTooltip) storyButton.style.transform = 'scale(1)';
+			}, 300);
+		},
+		false
+	);
+};
+
+const addTooltip = (post, text, button, index) => {
+	const name = Textbox.name;
+
+	const tooltip = document.createElement('div');
+
+	tooltip.classList.add('custom-tooltip');
+
+	const circle = document.createElement('circle');
+
+	circle.style = `
+        height: 15px;
+        width: 15px;
+        background-color: ${Utils.shadeColor(index === 0 ? Colors.accent : Colors.codes[index], 20)};
+        border-radius: 50%;
+        position: absolute;
+        bottom: -17.5px;
+        left: 38.5px;
+    `;
+
+	tooltip.style = `
+        background-color: white;
+        position: absolute;
+        color: #33566a;
+        padding: 10px;
+        border-radius: 5px;
+        display: none;
+        font-size: 14px;
+        width: max-content;
+        max-width: 300px;
+        transition: all 0.1s ease-in-out;
+        left: -25px;
+        bottom: 65px;
+    `;
+
+	tooltip.style.border = `2px solid ${Utils.shadeColor(index === 0 ? Colors.accent : Colors.codes[index], 20)}`;
+
+	tooltip.innerText = Snippets.replaceTextWithConfigStuff(name, text);
+
+	button.appendChild(tooltip);
+	tooltip.appendChild(circle);
+
+	button.addEventListener(
+		'mouseenter',
+		(e) => {
+			tooltip.style.display = 'block';
+			button.style.transform = 'scale(1.1)';
+			button.style.backgroundColor = '#04c3cb';
+			button.style.border = `2px solid ${Utils.shadeColor(index === 0 ? Colors.accent : Colors.codes[index], 20)}`;
+			const storyButton = post.querySelector('.story-button');
+			if (storyButton) storyButton.style.transform = 'scale(0)';
+		},
+		false
+	);
+	button.addEventListener(
+		'mouseleave',
+		(e) => {
+			tooltip.style.display = 'none';
+			button.style.backgroundColor = Utils.shadeColor(index === 0 ? Colors.accent : Colors.codes[index], 20);
 			button.style.transform = 'scale(1)';
 			const storyButton = post.querySelector('.story-button');
 			if (!storyButton) return;
@@ -285,63 +378,6 @@ const addTooltip = (post, text, button) => {
 		false
 	);
 };
-// const addTooltip = (post, text, button) => {
-// 	const name = Textbox.name;
-
-// 	const tooltip = document.createElement('div');
-
-// 	tooltip.classList.add('custom-tooltip');
-
-// 	tooltip.style = `
-//         background-color: white;
-//         position: absolute;
-//         color: #33566a;
-//         padding: 2rem;
-//         box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
-//         border-radius: 5px;
-//         width:500px;
-//         top: 0;
-//         left: 40px;
-//         display: none;
-//         font-size:1.1rem;
-//     `;
-
-// 	tooltip.innerText = Snippets.replaceTextWithConfigStuff(Config.data, name, text);
-
-// 	button.appendChild(tooltip);
-// 	button.addEventListener(
-// 		'mouseenter',
-// 		(e) => {
-// 			tooltip.style.display = 'block';
-// 			tooltip.style.top = '-' + tooltip.getBoundingClientRect().height + 'px';
-// 			button.style.transform = 'scale(1.1)';
-// 			button.style.backgroundColor = '#04c3cb';
-// 			const storyButton = post.querySelector('.story-button');
-// 			if (storyButton) storyButton.style.transform = 'scale(0)';
-// 		},
-// 		false
-// 	);
-// 	button.addEventListener(
-// 		'mouseleave',
-// 		(e) => {
-// 			tooltip.style.display = 'none';
-// 			button.style.backgroundColor = `${window
-// 				.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
-// 				.getPropertyValue('--primary-button-background')}`;
-// 			button.style.transform = 'scale(1)';
-// 			const storyButton = post.querySelector('.story-button');
-// 			if (!storyButton) return;
-
-// 			setTimeout(() => {
-// 				const showingTooltip = [...post.querySelectorAll('.custom-tooltip')].find(
-// 					(t) => window.getComputedStyle(t).display === 'block'
-// 				);
-// 				if (!showingTooltip) storyButton.style.transform = 'scale(1)';
-// 			}, 300);
-// 		},
-// 		false
-// 	);
-// };
 
 const getName = (post) => {
 	if (document.activeElement.getAttribute('aria-label').includes('Reply to'))
