@@ -48,7 +48,7 @@ StoryButton.setStyles = (button) => {
 };
 
 StoryButton.addListeners = (button, post) => {
-	button.addEventListener('click', async (e) => console.log('clicked'), { once: true });
+	button.addEventListener('click', async (e) => console.log(Post.extractValues(post)), { once: true });
 
 	button.addEventListener(
 		'mouseover',

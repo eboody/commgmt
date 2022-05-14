@@ -26,7 +26,6 @@ Post.process = async (post) => {
 
 Post.hidePost = (post, isOrg = false) => {
 	post.style.marginBottom = '0rem';
-	// post.style.transition = 'all 300ms ease-in-out';
 	post.style.height = '3rem';
 
 	if (post.previousElementSibling?.querySelector('.dot')) {
@@ -102,7 +101,6 @@ Post.expand = function (post) {
 Post.save = async (post) => {
 	const postValues = await Post.extractValues(post);
 	if (!postValues.content || postValues.name === Config.data.nonprofit) return;
-	// console.log(postValues);
 };
 
 Post.setListeners = (post) => {
@@ -179,7 +177,7 @@ Post.extractValues = (post) => {
 			.slice(3)
 			.join(' ')
 			.replace(/\s*\·\s*/, '');
-	const time = Post.getTimeOfPostFromRelativeTime(
+	const time = Dates.getTimeOfPostFromRelativeTime(
 		post.querySelector('span[id]')?.querySelector('[aria-label]')?.innerText || postContentArray[1]
 	);
 	const post_id = [...post.querySelectorAll('a')].find((a) => a.href.includes('/post_insights/'))?.href.split('/')[6];

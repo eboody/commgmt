@@ -62,6 +62,12 @@ const handleCommentElementMutation = (mutationsList) => {
 		if (textbox === Textbox.element) return;
 		Textbox.set(textbox);
 
+		Textbox.element.scrollIntoView({
+			behavior: 'smooth',
+			block: 'center',
+			inline: 'center',
+		});
+
 		Snippets.createButtons();
 
 		Textbox.form.addEventListener('click', (e) => {

@@ -63,11 +63,6 @@ Utils.onVisible = (element, callback) => {
 	}).observe(element);
 };
 
-Utils.isTextBox = (el) => {
-	if (el.parentElement?.getAttribute('role') === 'textbox' || el?.getAttribute('role') === 'textbox') return true;
-	return false;
-};
-
 Utils.shadeColor = (color, percent) => {
 	var R = parseInt(color.substring(1, 3), 16);
 	var G = parseInt(color.substring(3, 5), 16);
@@ -86,4 +81,60 @@ Utils.shadeColor = (color, percent) => {
 	var BB = B.toString(16).length == 1 ? '0' + B.toString(16) : B.toString(16);
 
 	return '#' + RR + GG + BB;
+};
+const Dates = {
+	getTimeOfPostFromRelativeTime: (string) => {
+		if (/^\d+h$/.test(string)) return Dates.subtractHours(string.replace('h', ''));
+		if (/^\d+m$/.test(string)) return Dates.subtractMinutes(string.replace('m', ''));
+		if (/^Yesterday.*[A|P]M$/.test(string)) return Dates.getYesterday(string);
+		if (
+			/^[January|February|March|April|May|June|July|August|September|October|November|December].*\d\d\sat\s.*[A|P]M$/.test(
+				string
+			)
+		)
+			return Dates.getDateFromString(string);
+	},
+
+	subtractHours: (hours) => new Date(new Date().getTime() - 1000 * 60 * 60 * parseInt(hours)),
+	subtractMinutes: (minutes) => new Date(new Date().getTime() - 1000 * 60 * parseInt(minutes)),
+	getYesterday: (string) => {
+		const time = Dates.getTimeFromString(string);
+		const isMorning = /AM$/.test(string);
+		const today = new Date();
+		const yesterday = today.getDate() - 1;
+		const month = today.getMonth() + 1;
+		const year = today.getFullYear();
+		return new Date(`${year}/${month}/${yesterday} ${time} ${isMorning ? 'AM' : 'PM'}`);
+	},
+
+	getTimeFromString: (string) => string.match(/\d+\:\d\d/)[0],
+
+	getDateFromString: (string) => {
+		const month = Dates.getMonthFromString(string);
+		const day = string.match(/\d+/);
+		const year = new Date().getFullYear();
+		const time = Dates.getTimeFromString(string);
+		const isMorning = /AM$/.test(string);
+		return new Date(`${year}/${month}/${day} ${time} ${isMorning ? 'AM' : 'PM'}`);
+	},
+
+	getMonthFromString: (string) => {
+		const monthNumber = Dates.months.find((month) => string.includes(month));
+		return Dates.months.indexOf(monthNumber) + 1;
+	},
+
+	months: [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December',
+	],
 };
