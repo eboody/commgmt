@@ -60,19 +60,16 @@ const handleCommentElementMutation = (mutationsList) => {
 		const textbox = getTextboxFromMutation(mutation);
 
 		if (textbox === Textbox.element) return;
-		Textbox.set(textbox);
 
-		Textbox.element.scrollIntoView({
-			behavior: 'smooth',
-			block: 'center',
-			inline: 'center',
-		});
+		Textbox.set(textbox);
+		Utils.scrollIntoView(Textbox.element);
 
 		Snippets.createButtons();
 
 		Textbox.form.addEventListener('click', (e) => {
 			e.stopPropagation();
 			Textbox.set(e.target);
+			Utils.scrollIntoView(Textbox.element);
 			Textbox.focus();
 			Snippets.createButtons();
 		});

@@ -1,5 +1,12 @@
 const Utils = {};
 
+Utils.scrollIntoView = (el) =>
+	el.scrollIntoView({
+		behavior: 'smooth',
+		block: 'center',
+		inline: 'center',
+	});
+
 Utils.createElement = (tag, name) => {
 	const element = document.createElement(tag);
 	element.classList.add(name);
