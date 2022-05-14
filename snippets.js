@@ -274,7 +274,7 @@ const addGroupTooltip = (post, text, button, index) => {
 		(e) => {
 			tooltip.style.display = 'block';
 			button.style.transform = 'scale(1.1)';
-			button.querySelector('img')?.style.transform = 'scale(1.3)';
+			button.querySelector('img').style.transform = 'scale(1.3)';
 			button.style.backgroundColor = '#04c3cb';
 			button.style.border = `2px solid ${Styles.colors.accent}`;
 			const storyButton = post.querySelector('.story-button');
