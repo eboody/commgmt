@@ -1,5 +1,12 @@
 const Utils = {};
 
+Utils.createElement = (tag, name) => {
+	const element = document.createElement(tag);
+	element.classList.add(name);
+	element.classList.add('removable');
+	return element;
+};
+
 Utils.capitalize = (input) => {
 	if (!input) return '';
 	return input.substring(0, 1).toUpperCase() + input.substring(1);

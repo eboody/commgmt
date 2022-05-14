@@ -33,7 +33,7 @@ StoryButton.setStyles = (button) => {
 					.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
 					.getPropertyValue('--primary-button-background')};
         border:none;
-        outline: 10px solid ${backgroundColor};
+        outline: 10px solid ${Styles.colors.background};
         font-size: 2.5rem;
         transition: all 0.1s ease-in-out;
         transform: scale(0.1);

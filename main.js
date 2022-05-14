@@ -1,30 +1,45 @@
+const Window = {
+	clear: () => {
+		Snippets.showing = false;
+
+		const previews = [...document.querySelectorAll('.removable')];
+
+		previews.forEach((el, index) => {
+			el.style.transform = 'scale(0)';
+			setTimeout(() => el.remove(), 10 * index);
+		});
+	},
+};
+
 const observeFeed = async () => {
 	await Config.waitForConfig();
 
 	let feedNode = document.querySelector('[role="feed"]');
 
-	[...feedNode.children].forEach((node) => {
-		if (!node.getAttribute('class') || node.querySelector('[class="suspended-feed"]')) return;
+	feedNode.style.position = 'relative';
+
+	[...feedNode.children].forEach((node, index) => {
+		const isNotPost = index === 0 || !node.getAttribute('class') || node.querySelector('[class="suspended-feed"]');
+		if (isNotPost) return;
 		Post.process(node);
 	});
 
-	const config = { attributes: true, childList: true, subtree: false };
-	// console.clear();
-	const callback = function (mutationsList) {
+	const observer = new MutationObserver((mutationsList) => {
 		mutationsList.forEach((mutation) => {
-			if (mutation.type === 'childList') {
-				const addedNode = mutation.addedNodes[0];
-				if (addedNode?.getAttribute('class')) {
-					const newPost = addedNode;
-					Post.process(newPost);
-				}
-			}
+			if (mutation.type !== 'childList') return;
+
+			const addedNode = mutation.addedNodes[0];
+
+			const nodeIsPost = addedNode?.getAttribute('class');
+
+			if (!nodeIsPost) return;
+
+			const newPost = addedNode;
+			Post.process(newPost);
 		});
-	};
+	});
 
-	const observer = new MutationObserver(callback);
-
-	observer.observe(feedNode, config);
+	observer.observe(feedNode, { attributes: true, childList: true, subtree: false });
 };
 
 const waitForFeed = () => {
@@ -32,17 +47,12 @@ const waitForFeed = () => {
 
 	console.log('Page loaded');
 
-	Colors.accent = window
-		.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
-		.getPropertyValue('--primary-button-background');
-
-	const target = document.body;
-
-	const config = { attributes: true, childList: true, subtree: true };
+	Styles.setAccent();
+	Styles.setBackground();
 
 	let observing = false;
 
-	const callback = function (mutationsList, obs) {
+	const observer = new MutationObserver((mutationsList, obs) => {
 		mutationsList.forEach((mutation) => {
 			if (mutation.type === 'childList') {
 				if (document.querySelector('[role="feed"]')) {
@@ -56,18 +66,13 @@ const waitForFeed = () => {
 				}
 			}
 		});
-	};
+	});
 
-	const observer = new MutationObserver(callback);
-
-	observer.observe(target, config);
+	observer.observe(document.body, { attributes: true, childList: true, subtree: true });
 };
 
 window.addEventListener('load', waitForFeed, false);
 
 window.addEventListener('click', () => {
-	Textbox.clear();
-	Post.clear();
-	Snippets.removeCustomStuff();
-	console.log('Window removed stuff');
+	Window.clear();
 });

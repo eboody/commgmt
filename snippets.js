@@ -103,9 +103,8 @@ Snippets.handleClick = async (post) => {
 	// }
 };
 
-Snippets.createButtons = (post, textBox) => {
-	const groups = document.createElement('div');
-	groups.setAttribute('class', 'snippet-groups');
+Snippets.createButtons = () => {
+	const groups = Utils.createElement('div', 'snippet-groups');
 
 	groups.style = `
         position: absolute;
@@ -113,32 +112,29 @@ Snippets.createButtons = (post, textBox) => {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        bottom: ${Post.element.getBoundingClientRect().height / 4}px;
+        width:max-content;
+        background-color: ${Styles.colors.background};
+        margin-left: -3rem;
+        padding: 5px;
+        border-radius: 10px;
+        top: ${Textbox.element.getBoundingClientRect().y - Post.element.getBoundingClientRect().y - 10}px;
     `;
 
 	if (Snippets.showing) {
-		Snippets.removeCustomStuff();
+		Window.clear();
 	}
+
 	Snippets.showing = true;
+
 	Snippets.sections.forEach((section, index) => {
 		setTimeout(() => groups.appendChild(createButton(Post.element, section, index), 10 * index));
 	});
 
-	post.appendChild(groups);
-};
-
-Snippets.removeCustomStuff = () => {
-	Snippets.showing = false;
-	const previews = [...document.querySelectorAll('.snippet-groups'), ...document.querySelectorAll('.custom-button')];
-	previews.forEach((el, index) => {
-		el.style.transform = 'scale(0)';
-		setTimeout(() => el.remove(), 10 * index);
-	});
+	Post.element.appendChild(groups);
 };
 
 const createButton = (post, section, index) => {
-	// console.log(section);
-	const button = document.createElement('button');
+	const button = Utils.createElement('button', 'snippet-group-button');
 
 	const same = '50';
 	const buttonHeight = same;
@@ -148,10 +144,9 @@ const createButton = (post, section, index) => {
         border-radius: ${window
 					.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
 					.getPropertyValue('--button-corner-radius')};
-        margin-left: -2.5rem;
         height: ${buttonHeight}px;
         width: ${buttonWidth}px;
-        background-color: ${Colors.accent};
+        background-color: ${Styles.colors.accent};
         color: #fff !important;
         font-size: 1.1rem !important;
         border: none;
@@ -194,7 +189,7 @@ const createButton = (post, section, index) => {
 
 	addGroupTooltip(post, section.name, button, index);
 
-	const image = document.createElement('img');
+	const image = Utils.createElement('img', 'group-image');
 	image.src = section.icon;
 	image.style.width = '100%';
 	button.appendChild(image);
@@ -206,8 +201,8 @@ const createButton = (post, section, index) => {
 const removeSnippets = (button) => button.querySelector('.section').remove();
 
 const createSnippetsButtons = (button, section) => {
-	const sectionElement = document.createElement('div');
-	sectionElement.setAttribute('class', 'section');
+	const sectionElement = Utils.createElement('div', 'section');
+
 	sectionElement.style = `
         position: absolute;
         left: 40px;
@@ -223,14 +218,15 @@ const createSnippetsButtons = (button, section) => {
         `;
 
 	section.messages.forEach((m, index) => {
-		const snippet = document.createElement('button');
+		const snippet = Utils.createElement('button', 'snippet');
+
 		snippet.innerText = index + 1;
 		snippet.style = `
             width: 50px;
             height: 50px;
             display: inline-block;
             margin: 0 3px;
-            background-color: ${Utils.shadeColor(index === 0 ? Colors.accent : Colors.codes[index], 20)};
+            background-color: ${Utils.shadeColor(Styles.colors.codes[index], 20)};
             border: none;
             color: white;
             font-size: 1.5rem;
@@ -250,7 +246,7 @@ const createSnippetsButtons = (button, section) => {
 const addGroupTooltip = (post, text, button, index) => {
 	const name = Textbox.name;
 
-	const tooltip = document.createElement('div');
+	const tooltip = Utils.createElement('div', 'tooltip');
 
 	tooltip.classList.add('custom-tooltip');
 
@@ -278,8 +274,9 @@ const addGroupTooltip = (post, text, button, index) => {
 		(e) => {
 			tooltip.style.display = 'block';
 			button.style.transform = 'scale(1.1)';
+			button.querySelector('img')?.style.transform = 'scale(1.3)';
 			button.style.backgroundColor = '#04c3cb';
-			button.style.border = `2px solid ${Colors.accent}`;
+			button.style.border = `2px solid ${Styles.colors.accent}`;
 			const storyButton = post.querySelector('.story-button');
 			if (storyButton) storyButton.style.transform = 'scale(0)';
 		},
@@ -289,8 +286,9 @@ const addGroupTooltip = (post, text, button, index) => {
 		'mouseleave',
 		(e) => {
 			tooltip.style.display = 'none';
-			button.style.backgroundColor = Colors.accent;
+			button.style.backgroundColor = Styles.colors.accent;
 			button.style.transform = 'scale(1)';
+			button.querySelector('img').style.transform = 'scale(1)';
 			button.style.boxShadow = 'rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px';
 			const storyButton = post.querySelector('.story-button');
 			if (!storyButton) return;
@@ -309,16 +307,13 @@ const addGroupTooltip = (post, text, button, index) => {
 const addTooltip = (post, text, button, index) => {
 	const name = Textbox.name;
 
-	const tooltip = document.createElement('div');
-
-	tooltip.classList.add('custom-tooltip');
-
-	const circle = document.createElement('circle');
+	const tooltip = Utils.createElement('div', 'tooltip');
+	const circle = Utils.createElement('div', 'circle');
 
 	circle.style = `
         height: 15px;
         width: 15px;
-        background-color: ${Utils.shadeColor(index === 0 ? Colors.accent : Colors.codes[index], 20)};
+        background-color: ${Utils.shadeColor(Styles.colors.codes[index], 20)};
         border-radius: 50%;
         position: absolute;
         bottom: -17.5px;
@@ -340,7 +335,7 @@ const addTooltip = (post, text, button, index) => {
         bottom: 65px;
     `;
 
-	tooltip.style.border = `2px solid ${Utils.shadeColor(index === 0 ? Colors.accent : Colors.codes[index], 20)}`;
+	tooltip.style.border = `2px solid ${Utils.shadeColor(Styles.colors.codes[index], 20)}`;
 
 	tooltip.innerText = Snippets.replaceTextWithConfigStuff(name, text);
 
@@ -353,7 +348,7 @@ const addTooltip = (post, text, button, index) => {
 			tooltip.style.display = 'block';
 			button.style.transform = 'scale(1.1)';
 			button.style.backgroundColor = '#04c3cb';
-			button.style.border = `2px solid ${Utils.shadeColor(index === 0 ? Colors.accent : Colors.codes[index], 20)}`;
+			button.style.border = `2px solid ${Utils.shadeColor(Styles.colors.codes[index], 20)}`;
 			const storyButton = post.querySelector('.story-button');
 			if (storyButton) storyButton.style.transform = 'scale(0)';
 		},
@@ -363,7 +358,7 @@ const addTooltip = (post, text, button, index) => {
 		'mouseleave',
 		(e) => {
 			tooltip.style.display = 'none';
-			button.style.backgroundColor = Utils.shadeColor(index === 0 ? Colors.accent : Colors.codes[index], 20);
+			button.style.backgroundColor = Utils.shadeColor(Styles.colors.codes[index], 20);
 			button.style.transform = 'scale(1)';
 			const storyButton = post.querySelector('.story-button');
 			if (!storyButton) return;
@@ -405,8 +400,7 @@ const upsertPreview = (node, text, textBox) => {
 			return;
 		preview.appendChild(constructSnippet(node, adjustedText, textBox));
 	} else {
-		preview = document.createElement('div');
-		preview.classList.add('custom-preview');
+		prview = Utils.createElement('div', 'preview');
 		preview.style = `
             background-color: white;
             max-width: 650px;
