@@ -72,6 +72,27 @@ Snippets.replaceTextWithConfigStuff = (name, string) => {
 		.replace(/(\{|\[|\<)FUNDRAISING\sURL(\}|\]|\>)/gi, Config.data.fbc_1click_url);
 };
 
+const constructSnippet = (node, text, textBox) => {
+	const snippet = document.createElement('p');
+	snippet.classList.add('custom-snippet');
+	snippet.style = `
+        background-color: #fff;
+        border-radius: 5px;
+        padding: 1.5rem;
+        box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
+    `;
+	const name = getName(node);
+	snippet.innerText = replaceTextWithConfigStuff(Congig.data, name, text);
+	snippet.addEventListener('click', () => {
+		snippet.remove();
+		removeEmptyPreviews();
+		navigator.clipboard.writeText(node.querySelector('.custom-preview')?.innerText || '');
+		textBox.focus();
+	});
+
+	return snippet;
+};
+
 Snippets.handleClick = async (post) => {
 	// if (await textBoxActive()) {
 	// 	const textBox = document.activeElement;

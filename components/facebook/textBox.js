@@ -30,6 +30,8 @@ Textbox.setLastComment = (textbox) => {
 	const textboxHasntChanged = form === Textbox.form;
 	const associatedCommentsHasAlreadyBeenInitialized = Array.isArray(form.associatedComments);
 
+	console.log('in setLastComment');
+	console.log(form.associatedComments);
 	if (!associatedCommentsHasAlreadyBeenInitialized) {
 		form.associatedComments = [Comment.element];
 		return;
@@ -39,7 +41,8 @@ Textbox.setLastComment = (textbox) => {
 		Textbox.form.associatedComments.push(Comment.element);
 	} else {
 		let lastCommentAssociatedWithTextbox = form.associatedComments.find((el) => el === Comment.element);
-		if (!lastCommentAssociatedWithTextbox) lastCommentAssociatedWithTextbox = form.associatedComments.pop();
+		if (!lastCommentAssociatedWithTextbox)
+			lastCommentAssociatedWithTextbox = form.associatedComments[form.associatedComments.length - 1];
 		Comment.set(lastCommentAssociatedWithTextbox);
 	}
 };
@@ -49,8 +52,8 @@ Textbox.setListener = (textbox) => {
 		const textbox = e.target;
 		Textbox.setLastComment(textbox);
 		Textbox.set(textbox);
-		Utils.scrollIntoView(Textbox.element);
 		Group.createButtons();
+		setTimeout(() => Utils.scrollIntoView(Textbox.element), 100);
 	};
 
 	const handleClick = (e) => {

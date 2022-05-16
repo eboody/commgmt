@@ -35,7 +35,7 @@ Group.createButtons = () => {
 
 	Snippets.sections.forEach((section, index, array) => {
 		const isLast = array.length === index + 1;
-		setTimeout(() => groups.appendChild(Group.createButton(Post.element, section, index, isLast), 10 * index));
+		setTimeout(() => groups.appendChild(Group.createButton(Post.element, section, index, isLast), 20 * index));
 	});
 
 	Post.element.appendChild(groups);
