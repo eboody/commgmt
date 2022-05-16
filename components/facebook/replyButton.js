@@ -7,34 +7,31 @@ ReplyButton.setListeners = (post) => {
 };
 
 ReplyButton.setListener = (replyButton) => {
-	replyButton.addEventListener('click', handleReplyButtonClick);
+	replyButton.addEventListener('click', () => handleReplyButtonClick(replyButton));
 };
 
-const handleReplyButtonClick = (event) => {
-	const replyButton = event.target;
-
+const handleReplyButtonClick = (replyButton) => {
 	commentElement = Comment.getElement(replyButton);
 
 	if (!commentElement) {
 		return replyButton.removeEventListener('click', handleReplyButtonClick);
 	}
 
-	commentAlreadySelected = commentElement === Comment.element;
-	if (!commentAlreadySelected) {
-		Comment.setElement(commentElement);
+	Comment.set(commentElement);
+
+	let lastTextboxChild = [...commentElement.querySelectorAll('[role="textbox"]')].slice(-1).pop();
+	if (lastTextboxChild) {
+		Textbox.set(lastTextboxChild);
+		// Textbox.click();
 	}
 
-	const textBoxChild = commentElement.querySelector('[role="textbox"]');
-	if (textBoxChild) {
-		Textbox.set(textBoxChild);
-		Textbox.click();
-	}
+	if (commentElement.hasMutationObserver) return;
+	commentElement.hasMutationObserver = true;
 
-	if (replyButton.hasMutationObserver) return;
-	replyButton.hasMutationObserver = true;
-
-	const commentElementObserver = new MutationObserver(handleCommentElementMutation);
+	const commentElementObserver = new MutationObserver((mutationsList) => handleCommentElementMutation(mutationsList));
 	commentElementObserver.observe(commentElement, { attributes: true, childList: true, subtree: true });
+	console.log('in handleReplyButtonClick');
+	console.log(Comment.name);
 };
 
 const mutationContainsTextbox = (mutation) => {
@@ -55,23 +52,10 @@ const getTextboxFromMutation = (mutation) => {
 
 const handleCommentElementMutation = (mutationsList) => {
 	mutationsList.forEach((mutation) => {
-		if (!mutationContainsTextbox(mutation)) return;
-
-		const textbox = getTextboxFromMutation(mutation);
-
-		if (textbox === Textbox.element) return;
-
-		Textbox.set(textbox);
-		Utils.scrollIntoView(Textbox.element);
-
-		Snippets.createButtons();
-
-		Textbox.form.addEventListener('click', (e) => {
-			e.stopPropagation();
-			Textbox.set(e.target);
-			Utils.scrollIntoView(Textbox.element);
-			Textbox.focus();
-			Snippets.createButtons();
-		});
+		if (mutationContainsTextbox(mutation)) {
+			const textbox = getTextboxFromMutation(mutation);
+			if (textbox === Textbox.element) return;
+			Textbox.setListener(textbox);
+		}
 	});
 };

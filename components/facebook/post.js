@@ -8,6 +8,10 @@ Post.process = async (post) => {
 
 	const postValues = Post.extractValues(post);
 
+	// if (postValues.post_id !== '393274116021334') {
+	// 	return Post.hidePost(post);
+	// }
+
 	const postIsFromNonprofit = postValues.name === Config.data.nonprofit;
 	if (postIsFromNonprofit) {
 		return Post.hidePost(post, (isOrg = true));
@@ -21,6 +25,7 @@ Post.process = async (post) => {
 	Post.whenVisible(post);
 	Post.expand(post);
 	Post.save(post);
+	Post.observe(post);
 	Post.setListeners(post);
 };
 
@@ -104,25 +109,30 @@ Post.save = async (post) => {
 };
 
 Post.setListeners = (post) => {
+	post.addEventListener('mouseenter', (e) => {
+		post.style.zIndex = 2;
+	});
+	post.addEventListener('mouseleave', (e) => {
+		if (post !== Post.element) post.style.zIndex = 1;
+	});
+	post.addEventListener('custom:altered-textbox', (e) => console.log(e));
 	post.addEventListener(
 		'click',
 		() => {
 			const selectedPostValues = Post.extractValues(post);
-
 			const clickedNewPost = selectedPostValues.post_id !== Post.values?.post_id || !Post.element;
 
 			if (clickedNewPost) {
-				Window.clear();
+				// Window.clear();
 				Post.element = post;
+				Post.element.zIndex = 2;
 				Post.values = selectedPostValues;
-				Post.element.style.zIndex = 1;
 			}
 		},
 		{ capture: true }
 	);
 
 	ReplyButton.setListeners(post);
-	Post.setListenerOnViewMoreComments(post);
 
 	post.querySelector('[aria-label="Write a comment"]')?.addEventListener('click', (e) => {
 		Window.clear();
@@ -131,35 +141,57 @@ Post.setListeners = (post) => {
 	});
 };
 
-Post.setListenerOnViewMoreComments = (post) => {
-	const viewMoreCommentsElement = [...post.querySelectorAll('[role="button"]')].find((b) =>
-		/view\s\d+\sprevious\scomments/i.test(b.innerText)
-	);
-
-	if (!viewMoreCommentsElement) return;
-
+Post.observe = (post) => {
 	const mutationContainsReply = (mutation) => {
-		if (mutation.type !== 'childList') return false;
-		if (!mutation.addedNodes?.length) return false;
 		const addedNode = mutation.addedNodes[0];
-		if (!addedNode || !addedNode.querySelector) return false;
-		if ([...addedNode.querySelectorAll('[role="button"]')].find((r) => r.innerText === 'Reply')) {
-			return true;
-		}
-		return false;
+
+		return (
+			addedNode &&
+			addedNode.querySelector &&
+			[...mutation.addedNodes[0].querySelectorAll('[role="button"]')].find((r) => r.innerText === 'Reply')
+		);
 	};
 
-	const handeViewMoreCommentsMutation = (mutationsList) => {
+	const mutationHasGif = (mutation) => {
+		const addedNode = mutation.addedNodes[0];
+
+		return addedNode && addedNode.querySelector && addedNode.querySelector('div[aria-label="Play GIF"]');
+	};
+	const mutationHasVideo = (mutation) => {
+		const addedNode = mutation.addedNodes[0];
+
+		return addedNode && addedNode.querySelector && addedNode.querySelector('video');
+	};
+
+	const handlePostMutation = (mutationsList) => {
 		mutationsList.forEach((mutation) => {
-			if (!mutationContainsReply(mutation)) return;
-			ReplyButton.setListeners(post);
+			const addedNode = mutation.addedNodes[0];
+			if (mutationContainsReply(mutation)) {
+				mutation.addedNodes.forEach((n) =>
+					[...n.querySelectorAll('[role="button"]')]
+						.filter((r) => r.innerText === 'Reply')
+						.forEach((b) => ReplyButton.setListener(b))
+				);
+			}
+			if (mutationContainsTextbox(mutation)) {
+				const textbox = addedNode.querySelector('[role="textbox"]');
+				Textbox.setListener(textbox);
+				if (!textbox.querySelector('span')) {
+					if (!Comment.getElement(textbox, true).contains(Comment.element))
+						Comment.set(Comment.getElement(textbox, true));
+				}
+			}
+			if (mutationHasGif(mutation)) {
+				addedNode.querySelector('div[aria-label="Play GIF"]').remove();
+			}
+			if (mutationHasVideo(mutation)) {
+				addedNode.querySelector('video').remove();
+			}
 		});
 	};
 
-	viewMoreCommentsElement.addEventListener('click', (e) => {
-		const commentElementObserver = new MutationObserver(handeViewMoreCommentsMutation);
-		commentElementObserver.observe(post, { attributes: true, childList: true, subtree: true });
-	});
+	const postObserver = new MutationObserver(handlePostMutation);
+	postObserver.observe(post, { attributes: true, childList: true, subtree: true });
 };
 
 Post.extractValues = (post) => {

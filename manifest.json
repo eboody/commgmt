@@ -10,13 +10,14 @@
 				"utils.js",
 				"icons.js",
 				"styles.js",
-				"textBox.js",
-				"comment.js",
-				"replyButton.js",
-				"storyButton.js",
+				"components/facebook/textBox.js",
+				"components/facebook/comment.js",
+				"components/facebook/replyButton.js",
+				"components/custom/storyButton.js",
 				"configs.js",
-				"post.js",
-				"snippets.js",
+				"components/facebook/post.js",
+				"components/custom/snippets.js",
+				"components/custom/snippetGroups.js",
 				"main.js"
 			]
 		}

@@ -2,6 +2,7 @@ const Styles = {
 	colors: {
 		accent: null,
 		background: null,
+		commentBackground: null,
 		primary: '#04C3CB',
 		codes: ['#755DB9', '#FF0261', '#FF8221', '002C45', '#014A60', 'CB3904', '#755DB9'],
 	},
@@ -14,5 +15,6 @@ Styles.setAccent = () => {
 };
 
 Styles.setBackground = () => {
+	Styles.colors.commentBackground = 'var(--comment-background)';
 	Styles.colors.background = 'var(--web-wash)';
 };

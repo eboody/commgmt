@@ -12,7 +12,7 @@ const Window = {
 };
 
 const observeFeed = async () => {
-	await Config.waitForConfig();
+	await Config.getConfig(window.location.href);
 
 	let feedNode = document.querySelector('[role="feed"]');
 
@@ -20,7 +20,12 @@ const observeFeed = async () => {
 
 	[...feedNode.children].forEach((node, index) => {
 		const isNotPost = index === 0 || !node.getAttribute('class') || node.querySelector('[class="suspended-feed"]');
-		if (isNotPost) return;
+		if (isNotPost) {
+			if (index === 0 && node && node.style) {
+				node.style.marginBottom = '24px';
+			}
+			return;
+		}
 		Post.process(node);
 	});
 
@@ -47,8 +52,14 @@ const waitForFeed = () => {
 
 	console.log('Page loaded');
 
-	Styles.setAccent();
-	Styles.setBackground();
+	document.querySelector('[role="main"]')?.addEventListener('click', (e) => {
+		if (!Post.element?.contains(e.target)) Window.clear();
+	});
+
+	setTimeout(() => {
+		Styles.setAccent();
+		Styles.setBackground();
+	}, 500);
 
 	let observing = false;
 
@@ -72,7 +83,3 @@ const waitForFeed = () => {
 };
 
 window.addEventListener('load', waitForFeed, false);
-
-window.addEventListener('click', () => {
-	Window.clear();
-});

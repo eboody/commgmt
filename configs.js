@@ -4,12 +4,12 @@ Config.getConfigFromGroupUrl = (configs, groupUrl = window?.location?.href) =>
 	configs.find((config) => config.group_url === groupUrl);
 
 Config.getConfig = async (url) => {
-	const rawConfig = fetch(`https://abc.1gu.xyz/event?group_url=${url}`, {
+	const rawConfig = await fetch(`https://abc.1gu.xyz/event?group_url=${url}`, {
 		headers: {
 			key: 'eranissodamncool',
 		},
 	});
-	let config = Snakify.object(await (await rawConfig).json());
+	let config = Snakify.object(await rawConfig.json());
 
 	config.activity_units = config.activity_unit === 'crunch' ? 'crunches' : config.activity_unit + 's';
 
@@ -25,6 +25,3 @@ Config.waitForConfig = async () => {
 		if (count === 10) throw "Couldn't get config";
 	}
 };
-(async () => {
-	await Config.getConfig(window.location.href);
-})();

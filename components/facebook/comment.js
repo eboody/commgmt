@@ -1,5 +1,6 @@
 const Comment = {
 	element: null,
+	name: null,
 };
 
 Comment.getElement = (el, articleFound = false) => {
@@ -11,12 +12,14 @@ Comment.getElement = (el, articleFound = false) => {
 		return el;
 	}
 
-	const encounteredArticle = el.getAttribute('role') === 'article' || articleFound;
+	const encounteredArticle = el.getAttribute('role') === 'article' || articleFound || el.matches('ul');
 	return Comment.getElement(el.parentElement, encounteredArticle);
 };
 
-Comment.setElement = (el) => (Comment.element = el);
-
-// Comment.highlight = () => (Comment.element.style.border = `2px solid ${Styles.colors.accent}`);
-
-// Comment.unhighlight = () => (Comment.element.style.border = `none`);
+Comment.set = (el) => {
+	if (!el) return;
+	Comment.element = el;
+	Comment.name = [...el.querySelectorAll('a[href^="/groups/367608568587889/user/"]')].find(
+		(a) => !a.querySelector('svg')
+	).innerText;
+};
