@@ -11,9 +11,9 @@ AI.isStory = async (story) => {
 	return response.isStory;
 };
 
-AI.generateResponses = async (story, org) => {
+AI.generateResponses = async (story, org, name) => {
 	const response = await (
-		await fetch(`https://commgmt.herokuapp.com/generateResponses?story=${story}&org=${org}`, {
+		await fetch(`https://commgmt.herokuapp.com/generateResponses?story=${story}&org=${org}&name=${name}`, {
 			headers: {
 				key: 'eranissodamncool',
 			},

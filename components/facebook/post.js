@@ -25,11 +25,10 @@ Post.process = async (post) => {
 		AI.isStory(postValues.content).then((isStory) => {
 			if (isStory) {
 				post.isStory = true;
-				const org = Config.data.nonprofit;
-				AI.generateResponses(postValues.content, org).then((responses) => {
+				AI.generateResponses(postValues.content, Config.data.nonprofit, postValues.name).then((responses) => {
 					post.responses = responses;
 					post.style.transition = 'all 0.7s ease-in-out';
-					post.style.boxShadow = 'rgb(254 254 255) 0px 7px 29px 0px';
+					post.style.boxShadow = 'rgb(254 254 255) 0px 0px 20px 0px';
 					post.style.borderRadius = '10px';
 				});
 			}
