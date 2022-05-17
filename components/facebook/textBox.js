@@ -30,8 +30,6 @@ Textbox.setLastComment = (textbox) => {
 	const textboxHasntChanged = form === Textbox.form;
 	const associatedCommentsHasAlreadyBeenInitialized = Array.isArray(form.associatedComments);
 
-	console.log('in setLastComment');
-	console.log(form.associatedComments);
 	if (!associatedCommentsHasAlreadyBeenInitialized) {
 		form.associatedComments = [Comment.element];
 		return;
@@ -49,6 +47,9 @@ Textbox.setLastComment = (textbox) => {
 
 Textbox.setListener = (textbox) => {
 	const handleFocus = (e) => {
+		if (Preview.showing) {
+			return;
+		}
 		const textbox = e.target;
 		Textbox.setLastComment(textbox);
 		Textbox.set(textbox);
@@ -62,10 +63,10 @@ Textbox.setListener = (textbox) => {
 
 	if (!Textbox.getForm(textbox).alreadyListening) {
 		Textbox.getForm(textbox).addEventListener('focus', handleFocus, { capture: true });
-		Textbox.getForm(textbox).addEventListener('click', handleClick);
+		// Textbox.getForm(textbox).addEventListener('click', handleClick);
 		Textbox.getForm(textbox).alreadyListening = true;
 	}
 };
 
-Textbox.focus = () => Textbox.element?.focus();
+Textbox.focus = () => Comment.focus() || Textbox.element.focus();
 Textbox.click = () => Textbox.element?.dispatchEvent(new Event('click', { bubbles: true }));

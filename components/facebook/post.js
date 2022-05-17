@@ -6,24 +6,42 @@ const Post = {
 Post.process = async (post) => {
 	post.style.marginBottom = '3rem';
 
+	Post.expand(post);
+
 	const postValues = Post.extractValues(post);
+	if (postValues.content.includes('Press Enter to post')) postValues.content = null;
 
 	// if (postValues.post_id !== '393274116021334') {
 	// 	return Post.hidePost(post);
 	// }
 
-	const postIsFromNonprofit = postValues.name === Config.data.nonprofit;
+	const postIsFromNonprofit = postValues.name.includes(Config.data.nonprofit);
 	if (postIsFromNonprofit) {
 		return Post.hidePost(post, (isOrg = true));
 	}
 
+	const isCandidate = postValues.content && postValues.content.length > 100;
+	if (isCandidate) {
+		AI.isStory(postValues.content).then((isStory) => {
+			if (isStory) {
+				post.isStory = true;
+				const org = Config.data.nonprofit;
+				AI.generateResponses(postValues.content, org).then((responses) => {
+					post.responses = responses;
+					post.style.transition = 'all 0.7s ease-in-out';
+					post.style.boxShadow = 'rgb(254 254 255) 0px 7px 29px 0px';
+					post.style.borderRadius = '10px';
+				});
+			}
+		});
+	}
+
 	const postDoesntHaveTextContent = !postValues.content && !/[1-9]+\sComments/.test(post.innerText);
 	if (postDoesntHaveTextContent) {
-		return Post.hidePost(post);
+		// return Post.hidePost(post);
 	}
 
 	Post.whenVisible(post);
-	Post.expand(post);
 	Post.save(post);
 	Post.observe(post);
 	Post.setListeners(post);
@@ -56,7 +74,7 @@ Post.hidePost = (post, isOrg = false) => {
         border-radius: 50%;
         position: absolute;
         top: -21px;
-        left: -21px;
+        left: -50px;
         z-index: 1;
         border: none;
         display:flex;
@@ -83,11 +101,11 @@ Post.hidePost = (post, isOrg = false) => {
 };
 
 Post.whenVisible = (post) => {
-	Utils.onVisible(post.querySelector('svg'), () =>
-		setTimeout(() => {
-			StoryButton.create(post);
-		}, 500)
-	);
+	// Utils.onVisible(post.querySelector('svg'), () =>
+	// 	setTimeout(() => {
+	// 		StoryButton.create(post);
+	// 	}, 500)
+	// );
 };
 
 Post.expand = function (post) {
@@ -118,12 +136,12 @@ Post.setListeners = (post) => {
 	post.addEventListener('custom:altered-textbox', (e) => console.log(e));
 	post.addEventListener(
 		'click',
-		() => {
+		(e) => {
 			const selectedPostValues = Post.extractValues(post);
 			const clickedNewPost = selectedPostValues.post_id !== Post.values?.post_id || !Post.element;
 
 			if (clickedNewPost) {
-				// Window.clear();
+				Window.clear();
 				Post.element = post;
 				Post.element.zIndex = 2;
 				Post.values = selectedPostValues;
@@ -135,8 +153,11 @@ Post.setListeners = (post) => {
 	ReplyButton.setListeners(post);
 
 	post.querySelector('[aria-label="Write a comment"]')?.addEventListener('click', (e) => {
-		Window.clear();
-		console.log('clicked the post textbox');
+		// Window.clear();
+		Comment.element = Comment.name = null;
+		Textbox.set(post.querySelector('[aria-label="Write a comment"]'));
+		Utils.scrollIntoView(Textbox.element);
+		Group.createButtons();
 		e.stopPropagation();
 	});
 };
@@ -202,7 +223,8 @@ Post.extractValues = (post) => {
 		.map((el) => el.trim().replace('· ', ''))
 		.filter((el) => el && !/^\+\d+$/.test(el));
 
-	const name = post.querySelector('h3 strong')?.innerText;
+	const name =
+		post.querySelector('h3 strong')?.innerText || post.querySelector('h3 strong')?.innerText || postContentArray[0];
 	const content =
 		post.querySelector('[data-ad-preview="message"]')?.textContent ||
 		postContentArray

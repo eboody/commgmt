@@ -16,6 +16,11 @@ Comment.getElement = (el, articleFound = false) => {
 	return Comment.getElement(el.parentElement, encounteredArticle);
 };
 
+Comment.focus = () => {
+	if (!Comment.element) return null;
+	[...Comment.element.querySelectorAll('[role="button"]')].find((el) => el.innerText === 'Reply').click();
+};
+
 Comment.set = (el) => {
 	if (!el) return;
 	Comment.element = el;

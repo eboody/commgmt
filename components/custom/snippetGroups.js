@@ -6,7 +6,6 @@ Group.createButtons = () => {
 	const connector = Utils.createElement('div', 'snippet-connector');
 
 	connector.style = `border-top: 2px solid var(--comment-background);
-    height: 19px;
     position: absolute;
     margin-top: 0rem;
     
@@ -14,17 +13,19 @@ Group.createButtons = () => {
 	groups.append(connector);
 
 	groups.style = `
-    position: absolute;
-    display: row;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+        position: absolute;
+        display: row;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         width:max-content;
         background-color: ${Styles.colors.commentBackground};
         margin-left: -5rem;
         padding: 5px;
         border-radius: 10px;
         top: ${Textbox.element.getBoundingClientRect().y - Post.element.getBoundingClientRect().y - 10}px;
+        z-index: 10;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
     `;
 
 	if (Snippets.showing) {
@@ -35,14 +36,20 @@ Group.createButtons = () => {
 
 	Snippets.sections.forEach((section, index, array) => {
 		const isLast = array.length === index + 1;
-		setTimeout(() => groups.appendChild(Group.createButton(Post.element, section, index, isLast), 20 * index));
+		setTimeout(() => groups.appendChild(Group.createButton(Post.element, section, index, isLast), 10 * index));
 	});
+
+	if (Post.element.responses) {
+		groups.appendChild(
+			Group.createButton(Post.element, { name: 'Responses', icon: '', messages: Post.element.responses }, 0, false)
+		);
+	}
 
 	Post.element.appendChild(groups);
 
 	const connectorWidth = Textbox.form.getBoundingClientRect().x - groups.getBoundingClientRect().x;
 	const adjustment = connectorWidth > 180 ? 64 : 65;
-	connector.style.width = `${connectorWidth - adjustment}px`;
+	connector.style.width = `${connectorWidth - adjustment < 75 ? 150 : connectorWidth - adjustment}px`;
 };
 
 Group.createButton = (post, section, index, isLast) => {
@@ -128,7 +135,7 @@ Group.addGroupTooltip = (post, text, button, index = -1) => {
         position: absolute;
         color: #33566a;
         padding: 10px;
-        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
         border-radius: 5px;
         display: none;
         font-size: 14px;

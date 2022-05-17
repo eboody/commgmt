@@ -17,4 +17,6 @@ Styles.setAccent = () => {
 Styles.setBackground = () => {
 	Styles.colors.commentBackground = 'var(--comment-background)';
 	Styles.colors.background = 'var(--web-wash)';
+	Styles.colors.surfaceBackground = 'var(--surface-background)';
+	Styles.colors.textColor = 'var(--secondary-button-text)';
 };

@@ -61,36 +61,15 @@ Snippets.replaceTextWithConfigStuff = (name, string) => {
 		.replace(/(\{|\[|\<)+(activity|challenge).emoji(\}|\]|\>)+/gi, Config.data.challenge_emoji || '')
 		.replace(/(\{|\[|\<)+org.heart(\}|\]|\>)+/gi, Config.data.org_heart || '❤')
 		.replace(/(\{|\[|\<)+first.name(\}|\]|\>)+/gi, name?.split(' ')[0])
-		.replace(/(\{|\[|\<)Activity.UNIT((\}|\]|\>)?S)(\}|\]|\>)?/gi, Config.data.activity_units)
-		.replace(/(\{|\[|\<)Activity.UNIT(\}|\]|\>)/gi, Config.data.activity_unit)
-		.replace(/(\{|\[|\<)event.month(\}|\]|\>)/gi, Config.data.event_month)
-		.replace(/(\{|\[|\<)challenge.month(\}|\]|\>)/gi, Config.data.event_month)
-		.replace(/(\{|\[|\<)End.Date(\}|\]|\>)/gi, Utils.formatDate(Config.data.end_date))
-		.replace(/(\{|\[|\<)org(\}|\]|\>)/gi, Config.data.nonprofit)
-		.replace(/(\{|\[|\<)opt.in.url(\}|\]|\>)/gi, Config.data.opt_in_url)
-		.replace(/(\{|\[|\<)1click.URL(\}|\]|\>)/gi, Config.data.fbc_1click_url)
-		.replace(/(\{|\[|\<)FUNDRAISING\sURL(\}|\]|\>)/gi, Config.data.fbc_1click_url);
-};
-
-const constructSnippet = (node, text, textBox) => {
-	const snippet = document.createElement('p');
-	snippet.classList.add('custom-snippet');
-	snippet.style = `
-        background-color: #fff;
-        border-radius: 5px;
-        padding: 1.5rem;
-        box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
-    `;
-	const name = getName(node);
-	snippet.innerText = replaceTextWithConfigStuff(Congig.data, name, text);
-	snippet.addEventListener('click', () => {
-		snippet.remove();
-		removeEmptyPreviews();
-		navigator.clipboard.writeText(node.querySelector('.custom-preview')?.innerText || '');
-		textBox.focus();
-	});
-
-	return snippet;
+		.replace(/(\{|\[|\<)+Activity.UNIT((\}|\]|\>)?S)(\}|\]|\>)?/gi, Config.data.activity_units)
+		.replace(/(\{|\[|\<)+Activity.UNIT(\}|\]|\>)+/gi, Config.data.activity_unit)
+		.replace(/(\{|\[|\<)+event.month(\}|\]|\>)+/gi, Config.data.event_month)
+		.replace(/(\{|\[|\<)+challenge.month(\}|\]|\>)+/gi, Config.data.event_month)
+		.replace(/(\{|\[|\<)+End.Date(\}|\]|\>)+/gi, Utils.formatDate(Config.data.end_date))
+		.replace(/(\{|\[|\<)+org(\}|\]|\>)+/gi, Config.data.nonprofit)
+		.replace(/(\{|\[|\<)+opt.in.url(\}|\]|\>)+/gi, Config.data.opt_in_url)
+		.replace(/(\{|\[|\<)+1click.URL(\}|\]|\>)+/gi, Config.data.fbc_1click_url)
+		.replace(/(\{|\[|\<)+FUNDRAISING\sURL(\}|\]|\>)+/gi, Config.data.fbc_1click_url);
 };
 
 Snippets.handleClick = async (post) => {
@@ -136,25 +115,45 @@ const createSnippetsButtons = (button, section) => {
             height: 50px;
             display: inline-block;
             margin: 0 3px;
-            background-color: ${Utils.shadeColor(Styles.colors.codes[index], 20)};
-            border: none;
-            color: white;
             font-size: 1.5rem;
             border-radius: ${window
 							.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
 							.getPropertyValue('--button-corner-radius')};
-            transition: all 0.1s ease-in-out;
-            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+                transition: all 0.1s ease-in-out;
+
+
         `;
+
+		snippet.setColor = () => {
+			snippet.style.color = Utils.shadeColor(Styles.colors.codes[index], 20);
+			snippet.style.backgroundColor = Styles.colors.commentBackground;
+			snippet.style.border = `1px solid ${Utils.shadeColor(Styles.colors.codes[index], 20)}`;
+			snippet.style.boxShadow = `rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px`;
+		};
+
+		snippet.invertColor = () => {
+			snippet.style.backgroundColor = `${Utils.shadeColor(Styles.colors.codes[index], 20)}`;
+			snippet.style.border = `2px solid ${Styles.colors.commentBackground}`;
+			snippet.style.color = Styles.colors.commentBackground;
+			snippet.style.boxShadow = `rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset`;
+		};
+
+		snippet.setColor();
+
 		addTooltip(Post.element, m, snippet, index);
 		sectionElement.appendChild(snippet);
+		snippet.addEventListener('click', (e) => {
+			e.stopPropagation();
+			Preview.upsertPreview(Snippets.replaceTextWithConfigStuff(Comment.name || Post.values.name, m));
+			Textbox.focus();
+		});
 	});
 
 	button.appendChild(sectionElement);
 };
 
 const addTooltip = (post, text, button, index) => {
-	const name = Comment.name;
+	const name = Comment.name || Post.values.name;
 
 	const color = Utils.shadeColor(Styles.colors.codes[index], 20);
 
@@ -169,6 +168,7 @@ const addTooltip = (post, text, button, index) => {
         position: absolute;
         bottom: -17.5px;
         left: 38.5px;
+        box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
     `;
 
 	tooltip.style = `
@@ -184,9 +184,10 @@ const addTooltip = (post, text, button, index) => {
         transition: all 0.1s ease-in-out;
         left: -25px;
         bottom: 65px;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
     `;
 
-	tooltip.style.border = `2px solid ${color}`;
+	tooltip.style.border = `2px solid ${Styles.colors.commentBackground}`;
 
 	tooltip.innerText = Snippets.replaceTextWithConfigStuff(name, text);
 
@@ -198,8 +199,7 @@ const addTooltip = (post, text, button, index) => {
 		(e) => {
 			tooltip.style.display = 'block';
 			button.style.transform = 'scale(1.1)';
-			button.style.backgroundColor = '#04c3cb';
-			button.style.border = `2px solid ${color}`;
+			button.invertColor();
 			const storyButton = post.querySelector('.story-button');
 			if (storyButton) storyButton.style.transform = 'scale(0)';
 		},
@@ -209,7 +209,7 @@ const addTooltip = (post, text, button, index) => {
 		'mouseleave',
 		(e) => {
 			tooltip.style.display = 'none';
-			button.style.backgroundColor = color;
+			button.setColor();
 			button.style.transform = 'scale(1)';
 			const storyButton = post.querySelector('.story-button');
 			if (!storyButton) return;

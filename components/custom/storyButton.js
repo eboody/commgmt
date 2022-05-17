@@ -7,7 +7,18 @@ StoryButton.create = async (post) => {
 
 	StoryButton.addListeners(button, post);
 
-	post.appendChild(button);
+	const container = document.createElement('div');
+	container.style = `
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    `;
+
+	container.appendChild(button);
+
+	post.appendChild(container);
 
 	setTimeout(() => (button.style.transform = 'scale(1)'), 10);
 };
@@ -21,14 +32,15 @@ StoryButton.setStyles = (button) => {
 
 	button.innerText = '+';
 
+	const buttonWidth = 50;
+
 	const styles = `
         position: absolute;
         top: 0;
         border-radius: 50%;
         margin-top: -26px;
-        margin-left: 20rem;
-        height: 50px;
-        width: 50px;
+        height: ${buttonWidth}px;
+        width: ${buttonWidth}px;
         background-color: ${window
 					.getComputedStyle(document.querySelector('[aria-label="Invite"]'))
 					.getPropertyValue('--primary-button-background')};
@@ -48,7 +60,20 @@ StoryButton.setStyles = (button) => {
 };
 
 StoryButton.addListeners = (button, post) => {
-	button.addEventListener('click', async (e) => console.log(Post.extractValues(post)), { once: true });
+	button.addEventListener(
+		'click',
+		async (e) => {
+			// console.log(Post.extractValues(post));
+			// console.log(Post.values);
+			const isStory = await AI.isStory(Post.values.content);
+			if (isStory) {
+				Post.element.responses = await AI.generateResponses(Post.values.content);
+				Post.element.style.boxShadow = 'rgb(254 254 255) 0px 7px 29px 0px';
+				Post.element.style.borderRadius = '10px';
+			}
+		}
+		// { once: true }
+	);
 
 	button.addEventListener(
 		'mouseover',

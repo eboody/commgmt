@@ -8,6 +8,7 @@
 			"matches": ["https://www.facebook.com/groups/*"],
 			"js": [
 				"utils.js",
+				"ai.js",
 				"icons.js",
 				"styles.js",
 				"components/facebook/textBox.js",
@@ -18,6 +19,7 @@
 				"components/facebook/post.js",
 				"components/custom/snippets.js",
 				"components/custom/snippetGroups.js",
+				"components/custom/responsePreview.js",
 				"main.js"
 			]
 		}

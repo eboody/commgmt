@@ -60,6 +60,7 @@ Utils.formatDate = (string) => {
 Utils.timeout = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 Utils.onVisible = (element, callback) => {
+	if (!element) return;
 	new IntersectionObserver((entries, observer) => {
 		entries.forEach((entry) => {
 			if (entry.intersectionRatio > 0) {

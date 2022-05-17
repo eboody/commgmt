@@ -1,6 +1,9 @@
 const Window = {
+	feedElement: null,
 	clear: () => {
+		console.log('cleared window');
 		Snippets.showing = false;
+		Preview.showing = false;
 
 		const previews = [...document.querySelectorAll('.removable')];
 
@@ -15,6 +18,8 @@ const observeFeed = async () => {
 	await Config.getConfig(window.location.href);
 
 	let feedNode = document.querySelector('[role="feed"]');
+
+	Window.feedElement = feedNode;
 
 	feedNode.style.position = 'relative';
 
@@ -35,7 +40,7 @@ const observeFeed = async () => {
 
 			const addedNode = mutation.addedNodes[0];
 
-			const nodeIsPost = addedNode?.getAttribute('class');
+			const nodeIsPost = addedNode?.querySelector('[aria-posinset]');
 
 			if (!nodeIsPost) return;
 
